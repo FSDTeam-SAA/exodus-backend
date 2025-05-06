@@ -19,7 +19,7 @@ export const createBus = catchAsync(async (req, res) => {
     statusCode: httpStatus.CREATED,
     success: true,
     message: 'Bus created successfully',
-    data: newBus,
+    data: newBus, 
   });
 });
 

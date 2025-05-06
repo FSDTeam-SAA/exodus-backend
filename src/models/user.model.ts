@@ -29,7 +29,7 @@ userSchema.pre('save', async function (next) {
   // Hash password 
   if (user.password) {
     const saltRounds = Number(process.env.bcrypt_salt_round) || 10;
-    let pass = user.password.toString()
+    let pass = user.password
       user.password = await bcrypt.hash(
           pass,
           saltRounds

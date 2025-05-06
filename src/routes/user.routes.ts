@@ -1,8 +1,9 @@
 import express from 'express'
-import { getUsers } from '../controllers/user.controller'
+import { getUsers, updateProfile } from '../controllers/user.controller'
+import { protect } from '../middlewares/auth.middleware'
 
 const router = express.Router()
 
-router.get('/', getUsers)
+router.patch('/update-profile',protect, updateProfile)
 
 export default router
