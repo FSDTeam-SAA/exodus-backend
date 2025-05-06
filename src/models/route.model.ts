@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose'
 import { IRoute } from '../interface/route.interface';
 
 
-const routeSchema: Schema<IRoute> = new Schema({
+const routeSchema: Schema<IRoute> = new Schema<IRoute>({
     bus_id: { type: Schema.Types.ObjectId, ref: 'bus', required: true },
     source: { type: String, required: true },
     destination: { type: String, required: true },
@@ -14,4 +14,4 @@ const routeSchema: Schema<IRoute> = new Schema({
     avaiableSeat: { type: [String], required: true },
   });
   
-  export const Bus = mongoose.model<IRoute>('Route', routeSchema);
+  export const Route = mongoose.model<IRoute>('Route', routeSchema);
