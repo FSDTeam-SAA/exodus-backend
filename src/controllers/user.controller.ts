@@ -12,10 +12,11 @@ import AppError from '../errors/AppError'
 //     res.json({ message: 'Get all users' })
 //   } catch (err) {
 //     next(err)
-//   }
+//   }  
 // }
 
-export const getUsers = catchAsync(async(req,res)=>{
+export const getUsers = catchAsync(async(req,res)=>{   
+  // console.log("dasfdsf")
   const user = null
   if(!user){
     throw new AppError(400, "user not found")

@@ -8,9 +8,9 @@ const app = express()
 
 app.use(express.json())
 
-app.use('/api/users', userRoutes)
+app.use('/api/v1/users', userRoutes)
 
-app.use(errorMiddleware)
+// app.use(errorMiddleware)
 app.use(globalErrorHandler);
 
 /** ------------ NOT FOUND URL ------------------- */
