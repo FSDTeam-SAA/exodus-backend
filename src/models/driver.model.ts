@@ -5,7 +5,7 @@ const driverSchema = new Schema<IDriver>(
   {
     busNumber: { type: String, required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
-    scanner_id: { type: String },
+    scannerId: { type: String },
   },
   { timestamps: true }
 )

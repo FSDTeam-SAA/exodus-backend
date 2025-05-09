@@ -7,20 +7,23 @@ const userSchema: Schema = new Schema<IUser>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String,select:0, required: true },
+    password: { type: String, select: 0, required: true },
     username: { type: String, required: true, unique: true },
     credit: { type: Number, default: 0 },
-    role: { 
-      type: String, 
+    role: {
+      type: String,
       default: 'user',
-      enum: ['user', 'admin','driver'],
+      enum: ['user', 'admin', 'driver'],
     },
-    avatar: { type: String, default: '' },
+    avatar: {
+      public_id: { type: String, default: '' },
+      url: { type: String, default: '' },
+    },
     verificationInfo: {
       verified: { type: Boolean, default: false },
-      token: { type: String, default: '' }
+      token: { type: String, default: '' },
     },
-    password_reset_token : {type: String, default: '' },
+    password_reset_token: { type: String, default: '' },
   },
   { timestamps: true }
 )

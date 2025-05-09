@@ -5,6 +5,7 @@ import busRoutes from './routes/bus.routes'
 import errorMiddleware from './middlewares/error.middleware'
 import { globalErrorHandler } from './middlewares/globalErrorHandler'
 import { notFound } from './middlewares/notFound'
+import driverRoutes from './routes/driver.routes'
 
 const app = express()
 
@@ -20,6 +21,9 @@ app.use('/api/v1/auth', authRoutes)
 /**---------------------- BUS ALL ROUTE -------------------------- */
 app.use('/api/v1/bus', busRoutes)
 
+
+/**---------------------- driver ALL ROUTE -------------------------- */
+app.use('/api/v1', driverRoutes)
 
 // app.use(errorMiddleware)
 app.use(globalErrorHandler);
