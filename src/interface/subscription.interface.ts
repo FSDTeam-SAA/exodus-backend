@@ -5,4 +5,4 @@ export interface ISubscription {
   price: number
   planValid: boolean
 }
-;``
+
