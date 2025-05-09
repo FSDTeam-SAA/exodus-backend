@@ -10,8 +10,14 @@ const app = express()
 
 app.use(express.json())
 
+
+/**---------------------- USER ALL ROUTE -------------------------- */
 app.use('/api/v1/users', userRoutes)
+
+/**---------------------- AUTH ALL ROUTE -------------------------- */
 app.use('/api/v1/auth', authRoutes)
+
+/**---------------------- BUS ALL ROUTE -------------------------- */
 app.use('/api/v1/bus', busRoutes)
 
 

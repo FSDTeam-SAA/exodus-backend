@@ -10,7 +10,11 @@ const userSchema: Schema = new Schema<IUser>(
     password: { type: String,select:0, required: true },
     username: { type: String, required: true, unique: true },
     credit: { type: Number, default: 0 },
-    role: { type: String, default: 'user' },
+    role: { 
+      type: String, 
+      default: 'user',
+      enum: ['user', 'admin','driver'],
+    },
     avatar: { type: String, default: '' },
     verificationInfo: {
       verified: { type: Boolean, default: false },
@@ -23,15 +27,14 @@ const userSchema: Schema = new Schema<IUser>(
 
 // Pre save middleware / hook : will work on create() save()
 userSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
+  const user = this as any;
 
   // Hash password 
   if (user.password) {
     const saltRounds = Number(process.env.bcrypt_salt_round) || 10;
-    let pass = user.password
+    let pass =  user.password
       user.password = await bcrypt.hash(
-          pass,
+          pass ,
           saltRounds
       );
   }

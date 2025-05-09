@@ -5,6 +5,7 @@ import catchAsync from "../utils/catchAsync";
 import { generateOTP } from "../utils/generateOTP";
 import httpStatus from "http-status";
 import sendResponse from "../utils/sendResponse";
+import { JwtPayload } from "jsonwebtoken";
 
 
 export const register = catchAsync(async (req, res) => {
@@ -135,7 +136,7 @@ export const verifyEmail = catchAsync(async (req, res) => {
         throw new AppError(httpStatus.BAD_REQUEST, 'User already verified')
     }
     if (otp) {
-        const savedOTP = verifyToken(user.verificationInfo.token, process.env.OTP_SECRET || "")
+        const savedOTP = verifyToken(user.verificationInfo.token, process.env.OTP_SECRET || "") as JwtPayload
         console.log(savedOTP)
         if (otp === savedOTP.otp) {
             user.verificationInfo.verified = true
