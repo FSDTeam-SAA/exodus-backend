@@ -119,3 +119,57 @@ export const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
     },
   })
 })
+
+// update driver info
+export const updateDriver = catchAsync(async (req: Request, res: Response) => {
+  const { id, name, email, phone, username } = req.body
+
+  if (!id) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Driver ID is required')
+  }
+
+  const driver = await User.findOne({ _id: id, role: 'driver' })
+
+  if (!driver) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Driver not found')
+  }
+
+  // Update only basic info (not password)
+  driver.name = name || driver.name
+  driver.email = email || driver.email
+  if (phone !== undefined) {
+    (driver as any).phone = phone
+  }
+  driver.username = username || driver.username
+
+  await driver.save()
+
+  const updatedDriver = driver.toObject()
+  delete (updatedDriver as any).password
+  delete (updatedDriver as any).password_reset_token
+  delete (updatedDriver as any).verificationInfo
+
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: 'Driver updated successfully',
+    data: {
+      driver: updatedDriver,
+    },
+  })
+})
+
+// delete driver
+export const deleteDriver = catchAsync(async (req: Request, res: Response) => {
+  const driverId = req.params.id
+
+  const driver = await User.findOneAndDelete({ _id: driverId, role: 'driver' })
+
+  if (!driver) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Driver not found or already deleted')
+  }
+
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: 'Driver deleted successfully',
+  })
+})
