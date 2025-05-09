@@ -31,3 +31,4 @@ const busSchema: Schema = new Schema<IBus>(
 )
 
 export const Bus = mongoose.model<IBus>('Bus', busSchema)
+ 
