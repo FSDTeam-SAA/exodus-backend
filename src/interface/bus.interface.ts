@@ -2,7 +2,7 @@
 export interface IBus extends Document {
     name: string
     bus_number: string
-    seat: string,
+    seat: number,
     credit: number,
     standing: number,
     price: number,
