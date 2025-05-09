@@ -21,7 +21,7 @@ export interface IUser extends Document {
   };
   export interface UserModel extends Model<IUser> {
     isUserExistsByEmail(email: string): Promise<IUser>;
-    isOTPVerified(OTP: string, SavedOTP: string,OTPExpiresAt :Date, OTPUsed : boolean) : Promise<boolean>;
+    isOTPVerified(id:string) : Promise<boolean>;
     isPasswordMatched(plainTextPassword: string, hashPassword: string): Promise<boolean>;
     isJWTIssuedBeforePasswordChanged(passordChangeTimeStamp: Date, JwtIssuedTimeStamp: number): boolean;
   }

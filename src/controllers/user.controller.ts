@@ -1,21 +1,9 @@
-import { Request, Response, NextFunction } from 'express'
 import catchAsync from '../utils/catchAsync'
 import sendResponse from '../utils/sendResponse'
 import AppError from '../errors/AppError'
 import { User } from '../models/user.model'
 import httpStatus from "http-status";
 
-// export const getUsers = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     res.json({ message: 'Get all users' })
-//   } catch (err) {
-//     next(err)
-//   }  
-// }
 
 
 export const updateProfile = catchAsync(async (req, res) =>{
