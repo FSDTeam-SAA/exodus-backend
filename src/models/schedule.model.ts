@@ -6,8 +6,8 @@ const busSchema: Schema = new Schema<ISchedule>(
     schedules: [
       {
         day: String,
-        arrivalTime: String,
-        departureTime: String,
+        arrivalTime: Date,
+        departureTime: Date,
       },
     ],
     driverId: { type: Schema.Types.ObjectId, ref: 'Driver' },
@@ -16,4 +16,4 @@ const busSchema: Schema = new Schema<ISchedule>(
   { timestamps: true }
 )
 
-export const Bus = mongoose.model<ISchedule>('Bus', busSchema)
+export const Schedule = mongoose.model<ISchedule>('Schedule', busSchema)
