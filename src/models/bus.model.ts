@@ -6,7 +6,7 @@ const busSchema: Schema = new Schema<IBus>(
   {
     name: { type: String, required: true },
     bus_number: { type: String, required: true },
-    seat: { type: String, required: true },
+    seat: { type: Number, required: true },
     standing: { type: Number, required: true },
     source: { type: String, required: true },
     stops: [{
