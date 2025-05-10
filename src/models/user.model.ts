@@ -9,7 +9,7 @@ const userSchema: Schema = new Schema<IUser>(
     email: { type: String, required: true, unique: true },
     password: { type: String, select: 0, required: true },
     username: { type: String, required: true, unique: true },
-    credit: { type: Number, default: 0 },
+    credit: { type: Number, default: null },
     role: {
       type: String,
       default: 'user',

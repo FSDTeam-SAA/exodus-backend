@@ -1,23 +1,25 @@
 import mongoose, { Schema, model } from 'mongoose'
 import { IReserveBus } from '../interface/reserveBus.interface'
 
-// Schema
-const reserveBusSchema = new Schema<IReserveBus>({
-  bus_number: { type: String, required: true },
-  time: { type: String, required: true },
-  day: { type: String, required: true },
-  price: { type: Number, required: true },
-  reservedBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
+const reserveBusSchema = new Schema<IReserveBus>(
+  {
+    bus_number: { type: String },
+    time: { type: String, required: true },
+    day: { type: Date, required: true },
+    price: { type: Number, required: true },
+    totalHour: { type: Number, required: true },
+    reservedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'reserved', 'cancelled'],
+      default: 'pending',
+    },
   },
-  status: {
-    type: String,
-    enum: ['pending', 'reserved'],
-    default: 'pending',
-  },
-}, { timestamps: true })
+  { timestamps: true }
+)
 
-// Model
 export const ReserveBus = model<IReserveBus>('ReserveBus', reserveBusSchema)

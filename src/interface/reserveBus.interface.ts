@@ -5,8 +5,9 @@ import { Types } from "mongoose"
 export interface IReserveBus {
   bus_number: string
   time: string
-  day: string
+  day: Date
   price: number
+  totalHour: number
   reservedBy: Types.ObjectId
-  status: 'pending' | 'reserved'
+  status: 'pending' | 'reserved' | 'canceled'
 }
