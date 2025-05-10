@@ -9,5 +9,5 @@ export interface IReserveBus {
   price: number
   totalHour: number
   reservedBy: Types.ObjectId
-  status: 'pending' | 'reserved' | 'canceled'
+  status: 'pending' | 'reserved' | 'cancelled'
 }
