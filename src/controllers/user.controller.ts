@@ -3,6 +3,7 @@ import sendResponse from '../utils/sendResponse'
 import AppError from '../errors/AppError'
 import { User } from '../models/user.model'
 import httpStatus from "http-status";
+import { Ticket } from '../models/ticket.model';
 
 
 
@@ -35,4 +36,19 @@ export const getUsers = catchAsync(async (req, res) => {
     message: 'Get all users',
     data: [],
   })
+})
+
+
+
+export const allRide = catchAsync(async (req, res) =>{
+  if(!req.user?._id){
+    throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized to access this route')
+  }
+  const ride = await Ticket.find({userId: req.user?._id}).select("-avaiableSeat")
+  sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Get all ride',
+    data: ride
+    })
 })

@@ -9,11 +9,11 @@ export interface ITicket {
   source: string,
   destination: string,
   date: Date,
-  time: Date
+  time: string
   qrCode: string
   validFor: Date,
   avaiableSeat: [string],
-  status: "pending" | "rejected" | "accpeted",
+  status: "pending" | "rejected" | "accpeted" | "booked",
   ride: "pending" | "cancelled" | "completed" | "running",
   key: string
   paymentStatus: "paid" | "unpaid" | "return",
