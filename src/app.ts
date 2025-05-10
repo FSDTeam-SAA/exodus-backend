@@ -31,7 +31,6 @@ app.use('/api/v1', driverRoutes)
 app.use('/api/v1', scheduleRoutes)
 
 /**---------------------- Subscription Route -------------------------- */
-
 app.use('/api/v1', subscriptionRoutes)
 
 // app.use(errorMiddleware)
