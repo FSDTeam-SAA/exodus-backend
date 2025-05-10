@@ -12,21 +12,15 @@ import { generateDefaultSeats } from '../interface/bus.interface'
 
 export const createTicket = catchAsync(async (req, res) => {
   const {
-    userId,
-    schedule,
-    price,
-    validFor,
     seatNumber,
     busNumber,
     source,
     destination,
     date,
-    paymentMethod,
-    paymentStatus,
-    transectionId
   } = req.body;
 
   const bus = await Bus.findById(busNumber);
+
   if (!bus) {
     throw new AppError(404, 'Bus not found')
   }
@@ -43,20 +37,42 @@ export const createTicket = catchAsync(async (req, res) => {
   const key = fromIndex < toIndex ? 'start' : 'back';
 
   // Step 3: Get the matching schedule by day
-  const scheduleDoc = await Schedule.findById(schedule);
+  const scheduleDoc = await Schedule.findOne({busId: busNumber});
+  // console.log(scheduleDoc);
+  
   if (!scheduleDoc) {
     throw new AppError(404, 'Schedule not found')
   }
 
   const travelDate = new Date(date);
+  let departureDateTime
+  const now = new Date();
+  console.log(travelDate)
   const dayOfWeek = travelDate.toLocaleDateString('en-US', { weekday: 'short' }); // e.g. "Sun"
 
   const daySchedule = scheduleDoc.schedules.find((s: any) => s.day === dayOfWeek);
   if (!daySchedule) {
     throw new AppError(404, 'Schedule not found')
   }
+
+  // Check if the travel date is in the past
+if (
+  travelDate.toDateString() < now.toDateString() || 
+  (travelDate.toDateString() === now.toDateString() && daySchedule?.departureTime)
+) {
+  // Parse departure time (assuming format is "HH:mm", e.g., "14:30")
+  const [hour, minute] = daySchedule.departureTime.split(':').map(Number);
+  departureDateTime = new Date(travelDate);
+  departureDateTime.setHours(hour, minute, 0, 0);
+  console.log(departureDateTime)
+
+  if (departureDateTime < now) {
+    throw new AppError(400, 'Cannot book ticket for past time');
+  }
+}
   let avaiableSeat
   let qrCode
+  let status = "pending"
 
   if(seatNumber !== "standing"){
 
@@ -71,11 +87,12 @@ export const createTicket = catchAsync(async (req, res) => {
   // 2. Check if seat is already taken on this bus, date, time, and seatNumber
   const isSeatTaken = await Ticket.findOne({
     busNumber,
-    date: new Date(date),
+    date: departureDateTime,
     source,
     destination,
-    time: time
-  });
+    time: time,
+    status: "booked"
+  }).sort("-createdAt");
 
   if (isSeatTaken) {
     totalSeat = isSeatTaken.avaiableSeat
@@ -86,6 +103,12 @@ export const createTicket = catchAsync(async (req, res) => {
   const seatToRemove = seatNumber.toString(); // if seatNumber is like 'A3' or convert number to label if needed
    avaiableSeat = totalSeat.filter(seat => seat !== seatToRemove);
 
+   const qrOptions = {
+  color: {
+    dark: '#C0A05C',   // QR color (e.g., blue)
+    light: '#ffffff'   // background color (e.g., light peach)
+  }
+};
 
   const qrPayload = {
     busNumber,
@@ -96,22 +119,23 @@ export const createTicket = catchAsync(async (req, res) => {
     date         // e.g. "2025-05-10"
   };
   
-   qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload));
+   qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload),qrOptions);
+   status = "booked"
 }
 
   // Step 5: Create ticket
   const ticket = await Ticket.create({
-    userId,
-    schedule,
-    price,
-    validFor,
+    userId: req.user?._id,
+    schedule: scheduleDoc._id,
+    price: bus.price,
     seatNumber,
     busNumber,
     source,
     destination,
-    date,
+    date: departureDateTime,
     time: daySchedule.departureTime,
     qrCode,
+    status,
     key,
     avaiableSeat,
   });
@@ -124,7 +148,44 @@ export const createTicket = catchAsync(async (req, res) => {
 });
 
 
-// export const applyStanding  = catchAsync( async(req,res)=>{
+
+export const getAllTicket = catchAsync(async(req,res)=>{
+  const {busNumber,source,destination,date, time} = req.body;
+  const ticket = await Ticket.find({busNumber,source,destination,date,time});
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Ticket found',
+    success: true,
+    data: ticket
+    })
+})
+
+export const accpeteStanding = catchAsync(async(req,res)=>{
+  const {id} = req.params;
+  const ticket = await Ticket.findById(id)
+  if(!ticket) {
+    throw new AppError( 404, 'Ticket not found')
+    }
+    const qrPayload = {
+      busNumber: ticket.busNumber,
+      userName: req?.user?.name,
+      time: ticket.time,        // e.g. "14:30"
+      from: ticket.source,
+      to: ticket.destination,
+      date: ticket.date         // e.g. "2025-05-10"
+    };
+    
+     ticket.qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload));
+     ticket.status = "accpeted";
+     await ticket.save();
+     sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Standing Request accpeted',
+      success: true,
+      data: ticket
+      })
+
+})
 
 
-// })
+

@@ -3,21 +3,22 @@ import httpStatus from 'http-status'
 import AppError from '../errors/AppError'
 import { Schedule } from '../models/schedule.model'
 import catchAsync from '../utils/catchAsync'
+import sendResponse from '../utils/sendResponse'
 
-interface IScheduleRequestBody {
-  schedules: Array<{
-    day: string
-    arrivalTime: Date
-    departureTime: Date
-  }>
-  driverId: string
-  busId: string
-}
+// interface IScheduleRequestBody {
+//   schedules: Array<{
+//     day: string
+//     arrivalTime: Date
+//     departureTime: Date
+//   }>
+//   driverId: string
+//   busId: string
+// }
 
 // Create a new schedule
 export const createSchedule = catchAsync(
-  async (req: Request, res: Response) => {
-    const { schedules, driverId, busId } = req.body as IScheduleRequestBody
+  async (req, res) => {
+    const { schedules, driverId, busId } = req.body 
 
     // Validate required fields
     if (!schedules || !driverId || !busId) {
@@ -53,41 +54,55 @@ export const createSchedule = catchAsync(
 
     // Populate the references
     const populatedSchedule = await Schedule.findById(newSchedule._id)
-      .populate('driverId')
-      .populate('busId')
+      .populate('driverId',"email username name")
+      .populate('busId', "name bus_number")
 
-    res.status(httpStatus.CREATED).json({
-      success: true,
+    // res.status(httpStatus.CREATED).json({
+    //   success: true,
+    //   message: 'Schedule created successfully',
+    //   data: {
+    //     schedule: populatedSchedule,
+    //   },
+    // })
+    sendResponse(res,{
+      statusCode: httpStatus.CREATED,
       message: 'Schedule created successfully',
-      data: {
-        schedule: populatedSchedule,
-      },
+      success: true,
+      data: populatedSchedule,
+        
     })
   }
 )
 
 // Get all schedules with populated fields
 export const getAllSchedules = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req, res) => {
     const schedules = await Schedule.find()
       .populate('driverId')
       .populate('busId')
 
-    res.status(httpStatus.OK).json({
-      success: true,
+    // res.status(httpStatus.OK).json({
+    //   success: true,
+    //   message: 'Schedules retrieved successfully',
+    //   data: {
+    //     schedules,
+    //   },
+    // })
+
+    sendResponse(res,{
+      statusCode: httpStatus.OK,
       message: 'Schedules retrieved successfully',
-      data: {
-        schedules,
-      },
+      success: true,
+      data: schedules,
     })
   }
 )
 
 // Update a schedule
 export const updateSchedule = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req, res) => {
     const { id } = req.params
-    const { schedules, driverId, busId } = req.body as IScheduleRequestBody
+    const { schedules, driverId, busId } = req.body
 
     // Validate required fields
     if (!schedules || !driverId || !busId) {
@@ -130,19 +145,25 @@ export const updateSchedule = catchAsync(
       throw new AppError(httpStatus.NOT_FOUND, 'Schedule not found')
     }
 
-    res.status(httpStatus.OK).json({
+    // res.status(httpStatus.OK).json({
+    //   success: true,
+    //   message: 'Schedule updated successfully',
+    //   data: {
+    //     schedule: updatedSchedule,
+    //   },
+    // })
+    sendResponse(res,{
+      statusCode: httpStatus.OK,
       success: true,
       message: 'Schedule updated successfully',
-      data: {
-        schedule: updatedSchedule,
-      },
+      data: updatedSchedule
     })
   }
 )
 
 // Delete a schedule
 export const deleteSchedule = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req, res) => {
     const { id } = req.params
 
     const deletedSchedule = await Schedule.findByIdAndDelete(id)
@@ -151,10 +172,17 @@ export const deleteSchedule = catchAsync(
       throw new AppError(httpStatus.NOT_FOUND, 'Schedule not found')
     }
 
-    res.status(httpStatus.OK).json({
+    // res.status(httpStatus.OK).json({
+    //   success: true,
+    //   message: 'Schedule deleted successfully',
+    //   data: null,
+    // })
+
+    sendResponse(res,{
+      statusCode: httpStatus.OK,
       success: true,
       message: 'Schedule deleted successfully',
-      data: null,
+      data: null
     })
   }
 )

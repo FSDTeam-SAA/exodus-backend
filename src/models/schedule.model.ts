@@ -6,11 +6,11 @@ const busSchema: Schema = new Schema<ISchedule>(
     schedules: [
       {
         day: String,
-        arrivalTime: Date,
-        departureTime: Date,
+        arrivalTime: String,
+        departureTime: String,
       },
     ],
-    driverId: { type: Schema.Types.ObjectId, ref: 'Driver' },
+    driverId: { type: Schema.Types.ObjectId, ref: 'User' },
     busId: { type: Schema.Types.ObjectId, ref: 'Bus' },
   },
   { timestamps: true }

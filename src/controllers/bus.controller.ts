@@ -4,6 +4,7 @@ import catchAsync from '../utils/catchAsync';
 import sendResponse from '../utils/sendResponse';
 import AppError from '../errors/AppError';
 import { Schedule } from '../models/schedule.model';
+import { Ticket } from '../models/ticket.model';
 
 // Create Bus
 export const createBus = catchAsync(async (req, res) => {
@@ -62,7 +63,10 @@ export const getAllBuses = catchAsync(async (req, res) => {
 
 // Get Single Bus
 export const getBusById = catchAsync(async (req, res) => {
+  const {source , destination , time, date} = req.body
   const bus = await Bus.findById(req.params.id);
+  const avaiableSeat = await Ticket.findOne({})
+
 
   if (!bus) {
     throw new AppError(httpStatus.NOT_FOUND, 'Bus not found');

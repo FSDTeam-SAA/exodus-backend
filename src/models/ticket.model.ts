@@ -10,14 +10,16 @@ const ticketSchema = new Schema<ITicket>({
   source: { type: String, required: true },
   destination: { type: String, required: true },
   date: { type: Date, required: true },
-  time: { type: Date, required: true },
-  qrCode: { type: String, required: true },
+  time: { type: String, required: true },
+  qrCode: { type: String},
   validFor: { type: Date},
   avaiableSeat: {type: [String]},
   status: { type: String, default: 'pending' },
   ride: { type: String, default: 'pending' },
   key: { type: String, required: true },
 
+},{
+  timestamps: true,
 })
 
 export const Ticket = model<ITicket>('Ticket', ticketSchema)
