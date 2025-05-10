@@ -3,10 +3,9 @@ import { ISubscription } from '../interface/subscription.interface'
 
 const subscriptionSchema = new Schema<ISubscription>({
   planName: { type: String, required: true },
-  totalRide: { type: Number, required: true },
-  credit: { type: Number, required: true },
+  roundtrip: { type: Number, required: true },
   price: { type: Number, required: true },
-  planValid: { type: Boolean, required: true },
+  planValid: { type: Boolean, default: true  },
 })
 
 export const Subscription = model<ISubscription>(
