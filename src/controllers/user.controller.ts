@@ -44,7 +44,7 @@ export const allRide = catchAsync(async (req, res) =>{
   if(!req.user?._id){
     throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized to access this route')
   }
-  const ride = await Ticket.find({userId: req.user?._id})
+  const ride = await Ticket.find({userId: req.user?._id}).select("-avaiableSeat")
   sendResponse(res,{
     statusCode: httpStatus.OK,
     success: true,

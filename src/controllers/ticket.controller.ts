@@ -151,7 +151,16 @@ if (
 
 export const getAllTicket = catchAsync(async(req,res)=>{
   const {busNumber,source,destination,date, time} = req.body;
-  const ticket = await Ticket.find({busNumber,source,destination,date,time});
+  const [hour, minute] = time.split(':').map(Number);
+
+  if (isNaN(hour) || isNaN(minute)) {
+    throw new AppError(400, 'Invalid time format');
+  }
+
+  const departureDateTime = new Date(date as string);
+  departureDateTime.setHours(hour, minute, 0, 0);
+
+  const ticket = await Ticket.find({busNumber,date:departureDateTime,time});
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Ticket found',

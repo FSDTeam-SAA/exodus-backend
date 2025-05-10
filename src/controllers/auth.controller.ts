@@ -7,6 +7,7 @@ import httpStatus from "http-status";
 import sendResponse from "../utils/sendResponse";
 import { JwtPayload } from "jsonwebtoken";
 import { Ticket } from "../models/ticket.model";
+import { sendEmail } from "../utils/sendEmail";
 
 
 export const register = catchAsync(async (req, res) => {
@@ -25,7 +26,7 @@ export const register = catchAsync(async (req, res) => {
     )
 
     const user = await User.create({ name, email, password, phone, username, verificationInfo: { token: otptoken } })
-
+    sendEmail(user.email, 'Registerd Account', `Your OTP is ${otp}`)
     // create token and sent to the client
 
     // const jwtPayload = {
@@ -73,7 +74,7 @@ export const login = catchAsync(async (req, res) => {
     ticket = await Ticket.find({
         userId: user._id, ride: "pending",
         $or: [
-            { status: "accepted" },
+            { status: "accpeted" },
             { status: "booked" }
         ]
     }).select("-avaiableSeat")
@@ -129,6 +130,7 @@ export const forgetPassword = catchAsync(async (req, res) => {
     await user.save()
 
     /////// TODO: SENT EMAIL MUST BE DONE
+    sendEmail(user.email, 'Reset Password', `Your OTP is ${otp}`)
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -139,8 +141,8 @@ export const forgetPassword = catchAsync(async (req, res) => {
 })
 
 export const resetPassword = catchAsync(async (req, res) => {
-    const { password, otp } = req.body;
-    const user = await User.isUserExistsByEmail(req.body.email)
+    const { password, otp,email } = req.body;
+    const user = await User.isUserExistsByEmail(email)
     if (!user) {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found')
     }
