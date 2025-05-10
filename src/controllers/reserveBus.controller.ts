@@ -3,7 +3,7 @@ import { ReserveBus } from '../models/reserveBus.model'
 import catchAsync from '../utils/catchAsync'
 import sendResponse from '../utils/sendResponse'
 import AppError from '../errors/AppError'
-
+import { User } from '../models/user.model'
 // Create Reserve Bus
 export const createReserveBus = catchAsync(async (req, res) => {
   const { bus_number, time, day, price, totalHour, reservedBy, status } =
@@ -20,6 +20,17 @@ export const createReserveBus = catchAsync(async (req, res) => {
       httpStatus.BAD_REQUEST,
       'All required fields must be provided'
     )
+  }
+
+  // Find the user making the reservation
+  const user = await User.findById(reservedBy).select('+credit') // Ensure credit is selected
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  // Check if user is a valid subscriber
+  if (user.credit === null) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You are not a valid subscriber')
   }
 
   const newReservation = await ReserveBus.create({
@@ -50,7 +61,7 @@ export const cancelReservation = catchAsync(async (req, res) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Reservation not found')
   }
 
-  reservation.status = 'canceled'
+  reservation.status = 'cancelled'
   await reservation.save()
 
   sendResponse(res, {
@@ -114,21 +125,20 @@ export const updateReservationStatus = catchAsync(async (req, res) => {
 
 // Get reservations by userId
 export const getReservationsByUserId = catchAsync(async (req, res) => {
-    const { userId } = req.params
-  
-    if (!userId) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'User ID is required')
-    }
-  
-    const reservations = await ReserveBus.find({ reservedBy: userId }).sort({
-      createdAt: -1,
-    })
-  
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Reservations retrieved successfully for the user',
-      data: reservations,
-    })
+  const { userId } = req.params
+
+  if (!userId) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User ID is required')
+  }
+
+  const reservations = await ReserveBus.find({ reservedBy: userId }).sort({
+    createdAt: -1,
   })
-  
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Reservations retrieved successfully for the user',
+    data: reservations,
+  })
+})
