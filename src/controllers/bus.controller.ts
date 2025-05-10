@@ -5,6 +5,7 @@ import sendResponse from '../utils/sendResponse';
 import AppError from '../errors/AppError';
 import { Schedule } from '../models/schedule.model';
 import { Ticket } from '../models/ticket.model';
+import { generateDefaultSeats } from '../interface/bus.interface';
 
 // Create Bus
 export const createBus = catchAsync(async (req, res) => {
@@ -63,22 +64,50 @@ export const getAllBuses = catchAsync(async (req, res) => {
 
 // Get Single Bus
 export const getBusById = catchAsync(async (req, res) => {
-  const {source , destination , time, date} = req.body
-  const bus = await Bus.findById(req.params.id);
-  const avaiableSeat = await Ticket.findOne({})
+  const { source, destination, time, date } = req.query;
 
-
-  if (!bus) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Bus not found');
+  if (!source || !destination || !time || !date) {
+    throw new AppError(400, 'source, destination, time, and date are required');
   }
+
+  const bus = await Bus.findById(req.params.id);
+  if (!bus) {
+    throw new AppError(404, 'Bus not found');
+  }
+
+  const [hour, minute] = time.split(':').map(Number);
+
+  if (isNaN(hour) || isNaN(minute)) {
+    throw new AppError(400, 'Invalid time format');
+  }
+
+  const departureDateTime = new Date(date as string);
+  departureDateTime.setHours(hour, minute, 0, 0);
+
+  console.log(departureDateTime)
+
+  const tickets = await Ticket.find({
+    seatNumber: { $ne: "standing" },
+    time,
+    date: departureDateTime,
+    busNumber: bus._id
+  }).sort("-createdAt");
+  console.log(tickets)
+
+  const latestTicket = tickets[0]; // may be undefined
+  const availableSeat = latestTicket?.avaiableSeat ?? generateDefaultSeats(bus.seat); // fallback if no tickets
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Bus retrieved successfully',
-    data: bus,
+    data: {
+      bus,
+      avaiableSeat: availableSeat
+    },
   });
 });
+
 
 // Update Bus
 export const updateBus = catchAsync(async (req, res) => {
@@ -127,7 +156,7 @@ export const deleteBus = catchAsync(async (req, res) => {
   });
 });
 
-export const getAvailableBuses = catchAsync( async (req, res) => {
+export const getAvailableBuses = catchAsync(async (req, res) => {
   const { from, to, date } = req.query;
 
   if (!from || !to || !date) {
@@ -139,42 +168,53 @@ export const getAvailableBuses = catchAsync( async (req, res) => {
   const isToday = travelDate.toDateString() === today.toDateString();
   const dayOfWeek = travelDate.toLocaleDateString('en-US', { weekday: 'short' }); // e.g., "Sun"
 
+  const buses = await Bus.find().lean();
 
-    const buses = await Bus.find().lean();
+  // Filter buses that go from `from` to `to`
+  const matchingBuses = buses.filter((bus) => {
+    const stopNames = bus.stops.map((s: any) => s.name);
+    const fromIndex = stopNames.indexOf(from as string);
+    const toIndex = stopNames.indexOf(to as string);
+    return fromIndex !== -1 && toIndex !== -1 ;
+  });
 
-    const matchingBuses = buses.filter((bus) => {
-      const stopNames = bus.stops.map((s: any) => s.name);
-      const fromIndex = stopNames.indexOf(from as string);
-      const toIndex = stopNames.indexOf(to as string);
-      return fromIndex !== -1 && toIndex !== -1 && fromIndex < toIndex;
-    });
+  const busIds = matchingBuses.map((bus) => bus._id);
 
-    const busIds = matchingBuses.map((bus) => bus._id);
+  let schedules = await Schedule.find({
+    busId: { $in: busIds },
+    schedules: {
+      $elemMatch: { day: dayOfWeek },
+    },
+  }).populate('busId');
 
+  // Filter schedules if today and departure time has passed
+  // if (isToday) {
+    const currentTime = `${travelDate.getHours().toString().padStart(2, '0')}:${travelDate.getMinutes().toString().padStart(2, '0')}`;
+  console.log(currentTime)
+    schedules = schedules.filter(schedule =>
+      schedule.schedules.some((s: any) =>
+        s.day === dayOfWeek && s.departureTime > currentTime
+      )
+    );
+  // }
 
-    let schedules = await Schedule.find({
-      busId: { $in: busIds },
-      schedule: {
-        $elemMatch: { day: dayOfWeek },
-      },
-    }).populate('busId');
+  // Map filtered schedules back to buses
+  const filteredBuses = schedules.map(schedule => {
+  const filteredSchedule = schedule.schedules.find(
+    (s: any) => s.day === dayOfWeek
+  );
 
+  return {
+    ...schedule.toObject(),
+    schedules: [filteredSchedule],
+  };
+});
 
-    if (isToday) {
-      const currentTime = `${today.getHours().toString().padStart(2, '0')}:${today.getMinutes().toString().padStart(2, '0')}`;
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Buses available',
+    data: filteredBuses
+  });
+});
 
-
-      schedules = schedules.filter(schedule =>
-        schedule.schedules.some((s: any) =>
-          s.day === dayOfWeek && s.departureTime > currentTime
-        )
-      );
-    }
-
-    sendResponse(res,{
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Buses available',
-      data: matchingBuses
-    })
-})
