@@ -1,5 +1,11 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express';
 import { Ticket } from '../models/ticket.model'
+import {User} from '../models/user.model' // Adjust the path as needed
+import httpStatus from 'http-status'
+import catchAsync from '../utils/catchAsync';
+import AppError from '../errors/AppError';
+import sendResponse from '../utils/sendResponse';
+
 
 export const getBookingStats = async (req: Request, res: Response) => {
   try {
@@ -10,7 +16,7 @@ export const getBookingStats = async (req: Request, res: Response) => {
             year: { $year: '$createdAt' },
             month: { $month: '$createdAt' },
           },
-          bookingCount: { $sum: 1 }, // Count total tickets
+          bookingCount: { $sum: 1 },
         },
       },
       {
@@ -30,3 +36,14 @@ export const getBookingStats = async (req: Request, res: Response) => {
   }
 }
   
+
+export const getTotalUsers = catchAsync(async (req: Request, res: Response) => {
+  const totalUsers = await User.countDocuments()
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Total user count retrieved successfully',
+    data: { totalUsers },
+  })
+})
