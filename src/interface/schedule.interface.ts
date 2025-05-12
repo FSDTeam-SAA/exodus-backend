@@ -7,7 +7,8 @@ interface ScheduleItem {
 }
 
 export interface ISchedule {
-  schedules: ScheduleItem[] 
+  schedules: ScheduleItem[]
   driverId: Types.ObjectId
-  busId: Types.ObjectId 
+  busId: Types.ObjectId
+  isActive: boolean
 }
