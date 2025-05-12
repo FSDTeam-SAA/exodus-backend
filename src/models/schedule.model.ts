@@ -12,6 +12,7 @@ const busSchema: Schema = new Schema<ISchedule>(
     ],
     driverId: { type: Schema.Types.ObjectId, ref: 'User' },
     busId: { type: Schema.Types.ObjectId, ref: 'Bus' },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
 )
