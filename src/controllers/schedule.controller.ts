@@ -186,3 +186,25 @@ export const deleteSchedule = catchAsync(
     })
   }
 )
+
+
+
+export const toggleScheduleStatus = catchAsync(async (req, res) => {
+  const { id } = req.params
+
+  const schedule = await Schedule.findById(id)
+
+  if (!schedule) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Schedule not found')
+  }
+
+  schedule.isActive = !schedule.isActive
+  await schedule.save()
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Schedule is now ${schedule.isActive ? 'active' : 'inactive'}`,
+    data: schedule,
+  })
+})
