@@ -4,6 +4,8 @@ import catchAsync from '../utils/catchAsync'
 import sendResponse from '../utils/sendResponse'
 import AppError from '../errors/AppError'
 import { User } from '../models/user.model'
+import { Notification } from '../models/notifications.model'
+import { io } from '../app'
 // Create Reserve Bus
 export const createReserveBus = catchAsync(async (req, res) => {
   const { bus_number, time, day, price, totalHour, reservedBy, status } =
@@ -42,6 +44,12 @@ export const createReserveBus = catchAsync(async (req, res) => {
     reservedBy,
     status,
   })
+    const notifications = await Notification.create({
+    userId: req.user?._id,
+    message: `Bus Reserved Application Successfully Done`,
+    type: "success",
+    });
+  io.to(`user_${req.user?._id}`).emit(notifications.message)
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -63,6 +71,13 @@ export const cancelReservation = catchAsync(async (req, res) => {
 
   reservation.status = 'cancelled'
   await reservation.save()
+  
+    const notifications = await Notification.create({
+    userId: reservation.reservedBy,
+    message: `Your Bus Reserved Application Cancelled`,
+    type: "success",
+    });
+  io.to(`user_${reservation.reservedBy}`).emit(notifications.message)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -114,6 +129,13 @@ export const updateReservationStatus = catchAsync(async (req, res) => {
 
   reservation.status = 'reserved'
   await reservation.save()
+
+      const notifications = await Notification.create({
+    userId: reservation.reservedBy,
+    message: `Your Bus Reserved Application Approved`,
+    type: "success",
+    });
+  io.to(`user_${reservation.reservedBy}`).emit(notifications.message)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

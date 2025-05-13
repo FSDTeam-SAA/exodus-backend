@@ -12,9 +12,14 @@ import subscriptionRoutes from './routes/subscription.routes'
 import reserveBusRoutes from './routes/reserveBus.routes'
 
 import dashboardRoutes from './routes/dashboard.routes'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 const app = express()
 
 app.use(express.json())
+const server = createServer(app);
+const io = new Server(server, {
+});
 
 
 /**---------------------- USER ALL ROUTE -------------------------- */
@@ -54,4 +59,22 @@ app.use(globalErrorHandler);
 /** ------------ NOT FOUND URL ------------------- */
 app.use(notFound as never);
 
-export default app
+
+// WebSocket connection
+io.on('connection', (socket) => {
+    console.log('A client connected:', socket.id);
+
+    // Join user-specific room for notifications
+    socket.on('joinUserRoom', (userId) => {
+        if (userId) {
+            socket.join(`user_${userId}`);
+            console.log(`Client ${socket.id} joined user room: ${userId}`);
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+    });
+});
+
+export {app,server,io}
