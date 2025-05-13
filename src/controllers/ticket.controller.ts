@@ -10,6 +10,8 @@ import sendResponse from '../utils/sendResponse'
 import httpStatus from 'http-status'
 import { generateDefaultSeats } from '../interface/bus.interface'
 import { generateUniqueString } from '../utils/generateOTP'
+import { io } from '../app'
+import { Notification } from '../models/notifications.model'
 
 export const createTicket = catchAsync(async (req, res) => {
   const {
@@ -38,7 +40,7 @@ export const createTicket = catchAsync(async (req, res) => {
   const key = fromIndex < toIndex ? 'start' : 'end';
 
   // Step 3: Get the matching schedule by day
-  const scheduleDoc = await Schedule.findOne({ busId: busNumber });
+  const scheduleDoc = await Schedule.findOne({ busId: busNumber, isActive: true });
   // console.log(scheduleDoc);
 
   if (!scheduleDoc) {
@@ -137,6 +139,12 @@ export const createTicket = catchAsync(async (req, res) => {
     key,
     avaiableSeat,
   });
+  const notifications = await Notification.create({
+    userId: req.user?._id,
+    message: `Ticket for ${bus.name} has been booked successfully`,
+    type: "success",
+    });
+  io.to(`user_${req.user?._id}`).emit(notifications.message)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Ticket created successfully',
@@ -223,8 +231,8 @@ export const scanTicket = catchAsync(async (req, res) => {
 
   const qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload), qrOptions);
 
+  const bus = await Bus.findOne({ _id: ticket.busNumber })
   if (ticket.status === 'running') {
-    const bus = await Bus.findOne({ _id: ticket.busNumber })
     const stopNames = bus?.stops.map((s: any) => s.name);
     const fromIndex = stopNames?.indexOf(stationName) || 1;
     const toIndex = stopNames?.indexOf(ticket.destination) || 1;
@@ -241,6 +249,14 @@ export const scanTicket = catchAsync(async (req, res) => {
   ticket.status = "running"
   ticket.qrCode = qrCode;
   const _ticket = await ticket.save()
+
+
+  const notifications = await Notification.create({
+    userId: _ticket.userId,
+    message: `Congratulation You ${_ticket.status} the ${bus?.name} ride`,
+    type: "success",
+    });
+  io.to(`user_${_ticket.userId}`).emit(notifications.message)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -311,6 +327,13 @@ export const cancelTicket = catchAsync(async (req, res) => {
     // Mark ticket as cancelled
     ticket.status = 'cancelled';
     await ticket.save();
+
+    const notifications = await Notification.create({
+    userId: req.user?._id,
+    message: `Cancelation successfully, cancellation fee equating to 10%`,
+    type: "success",
+    });
+  io.to(`user_${req.user?._id}`).emit(notifications.message)
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
