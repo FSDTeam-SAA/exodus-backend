@@ -10,6 +10,7 @@ import scheduleRoutes from './routes/schedule.routes'
 import ticketRoutes from './routes/ticket.routes'
 import subscriptionRoutes from './routes/subscription.routes'
 import reserveBusRoutes from './routes/reserveBus.routes'
+
 import dashboardRoutes from './routes/dashboard.routes'
 const app = express()
 
@@ -42,8 +43,10 @@ app.use('/api/v1', subscriptionRoutes)
 /**---------------------- Bus reserve Route -------------------------- */
 app.use('/api/v1', reserveBusRoutes )
 
+
 /**---------------------- Admin dashboard Route -------------------------- */
 app.use('/api/v1', dashboardRoutes )
+
 
 // app.use(errorMiddleware)
 app.use(globalErrorHandler);
