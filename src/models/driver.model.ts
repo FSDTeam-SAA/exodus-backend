@@ -3,7 +3,8 @@ import { IDriver } from '../interface/Driver.interface'
 
 const driverSchema = new Schema<IDriver>(
   {
-    busNumber: { type: String, required: true },
+    busNumber: { type: String
+    },
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
     scannerId: { type: String },
   },
