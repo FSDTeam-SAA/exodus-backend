@@ -11,10 +11,10 @@ export interface ITicket {
   date: Date,
   time: string
   qrCode: string
-  validFor: Date,
+  ticket_secret: string,
   avaiableSeat: [string],
-  status: "pending" | "rejected" | "accpeted" | "booked",
-  ride: "pending" | "cancelled" | "completed" | "running",
+  // status: "pending" | "rejected" | "accpeted" | "booked",
+  status: "pending" | "cancelled" | "completed" | "running",
   key: string
   paymentStatus: "paid" | "unpaid" | "return",
 }

@@ -12,10 +12,10 @@ const ticketSchema = new Schema<ITicket>({
   date: { type: Date, required: true },
   time: { type: String, required: true },
   qrCode: { type: String},
-  validFor: { type: Date},
+  ticket_secret: { type: String},
   avaiableSeat: {type: [String]},
   status: { type: String, default: 'pending' },
-  ride: { type: String, default: 'pending' },
+  // ride: { type: String, default: 'pending' },
   key: { type: String, required: true },
 
 },{
