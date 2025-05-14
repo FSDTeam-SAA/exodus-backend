@@ -230,7 +230,7 @@ export const refreshToken = catchAsync(async (req, res) => {
     }
 
     const decoded = verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET as string) as JwtPayload;
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded._id);
     if (!user || user.refreshToken !== refreshToken) {
         throw new AppError(401, 'Invalid refresh token');
     }
