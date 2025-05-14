@@ -32,15 +32,63 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const userSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, select: 0, required: true },
     username: { type: String, required: true, unique: true },
-    credit: { type: Number, default: 0 },
-    role: { type: String, default: 'user' }
+    credit: { type: Number, default: null },
+    role: {
+        type: String,
+        default: 'user',
+        enum: ['user', 'admin', 'driver'],
+    },
+    avatar: {
+        public_id: { type: String, default: '' },
+        url: { type: String, default: '' },
+    },
+    verificationInfo: {
+        verified: { type: Boolean, default: false },
+        token: { type: String, default: '' },
+    },
+    password_reset_token: { type: String, default: '' },
+    fine: { type: Number, default: 0 },
 }, { timestamps: true });
+// Pre save middleware / hook : will work on create() save()
+userSchema.pre('save', async function (next) {
+    const user = this;
+    // Hash password 
+    if (user.password) {
+        const saltRounds = Number(process.env.bcrypt_salt_round) || 10;
+        let pass = user.password;
+        user.password = await bcrypt_1.default.hash(pass, saltRounds);
+    }
+    next();
+});
+// //post middleware /hook
+// userSchema.post('save', function (doc, next) {
+//     doc.password = '';
+//     if (doc.verificationInfo) {
+//         doc.verificationInfo.OTP = '';
+//     }
+//     doc.secureFolderPin = '';
+//     next();
+// });
+userSchema.statics.isUserExistsByEmail = async function (email) {
+    return await exports.User.findOne({ email }).select('+password +secureFolderPin');
+};
+userSchema.statics.isOTPVerified = async function (id) {
+    const user = await exports.User.findById(id).select('+verificationInfo');
+    return user?.verificationInfo.verified;
+};
+userSchema.statics.isPasswordMatched = async function (plainTextPassword, hashPassword) {
+    return await bcrypt_1.default.compare(plainTextPassword, hashPassword);
+};
 exports.User = mongoose_1.default.model('User', userSchema);
