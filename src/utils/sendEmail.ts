@@ -3,10 +3,10 @@ export const sendEmail = async (to: string,subject:string, html: string) => {
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    secure: true,
+    secure: false,
     auth: {
-      user: 'snm.bdcalling@gmail.com',
-      pass: 'rvkd lcjc gebc blvx',
+      user: 'nm.bdcalling@gmail.com',
+      pass: 'rvkd lcjc gebc blvx',
     },
   });
   await transporter.sendMail({

@@ -25,6 +25,7 @@ const userSchema: Schema = new Schema<IUser>(
     },
     password_reset_token: { type: String, default: '' },
     fine: { type: Number, default: 0 },
+    refreshToken: { type: String, default: '' },
   },
   { timestamps: true }
 )
