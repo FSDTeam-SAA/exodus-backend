@@ -75,7 +75,8 @@ export const getBusById = catchAsync(async (req, res) => {
     throw new AppError(404, 'Bus not found');
   }
 
-  const [hour, minute] = time.split(':').map(Number);
+  const timeStr = time as string;
+  const [hour, minute] = timeStr.split(':').map(Number);
 
   if (isNaN(hour) || isNaN(minute)) {
     throw new AppError(400, 'Invalid time format');
@@ -106,8 +107,8 @@ export const getBusById = catchAsync(async (req, res) => {
       avaiableSeat: availableSeat
     },
   });
-});
 
+});
 
 // Update Bus
 export const updateBus = catchAsync(async (req, res) => {

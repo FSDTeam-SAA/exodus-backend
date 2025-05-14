@@ -33,29 +33,18 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Bus = void 0;
+exports.Schedule = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const busSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
-    bus_number: { type: String, required: true },
-    seat: { type: Number, required: true },
-    standing: { type: Number, required: true },
-    source: { type: String, required: true },
-    stops: [{
-            name: { type: String, required: true },
-            latitude: { type: Number },
-            longitude: { type: Number },
-            price: { type: Number },
-        }],
-    lastStop: { type: String },
-    price: { type: Number, required: true },
-    // totalSeat: {
-    //   type: [String],
-    //   default: generateDefaultSeats,
-    // },
-    // avaiableSeat: {
-    //   type: [String],
-    //   default: generateDefaultSeats,
-    // },
+    schedules: [
+        {
+            day: String,
+            arrivalTime: String,
+            departureTime: String,
+        },
+    ],
+    driverId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
+    busId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Bus' },
+    isActive: { type: Boolean, default: true },
 }, { timestamps: true });
-exports.Bus = mongoose_1.default.model('Bus', busSchema);
+exports.Schedule = mongoose_1.default.model('Schedule', busSchema);
