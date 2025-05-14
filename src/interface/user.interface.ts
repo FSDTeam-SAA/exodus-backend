@@ -17,7 +17,8 @@ export interface IUser extends Document {
     url: string
   }
   password_reset_token: string,
-  fine: number
+  fine: number,
+  refreshToken: string,
 }
 export type TLoginUser = {
   email: string

@@ -11,8 +11,8 @@ import { sendEmail } from "../utils/sendEmail";
 
 
 export const register = catchAsync(async (req, res) => {
-    const { name, email, password, phone, username } = req.body;
-    if (!name || !email || !password || !username) {
+    const { name, email, password, phone,username } = req.body;
+    if (!name || !email || !password ) {
         throw new AppError(httpStatus.FORBIDDEN, 'Please fill in all fields')
     }
     const otp = generateOTP()
@@ -24,9 +24,10 @@ export const register = catchAsync(async (req, res) => {
         process.env.OTP_SECRET as string,
         process.env.OTP_EXPIRE,
     )
+    const generatedUsername = username || email.split('@')[0]
 
-    const user = await User.create({ name, email, password, phone, username, verificationInfo: { token: otptoken } })
-    sendEmail(user.email, 'Registerd Account', `Your OTP is ${otp}`)
+    const user = await User.create({ name, email, password, phone, username: generatedUsername, verificationInfo: { token: otptoken } })
+    await sendEmail(user.email, 'Registerd Account', `Your OTP is ${otp}`)
     // create token and sent to the client
 
     // const jwtPayload = {
@@ -96,6 +97,9 @@ export const login = catchAsync(async (req, res) => {
         process.env.JWT_REFRESH_EXPIRES_IN as string,
     );
 
+    user.refreshToken = refreshToken;
+    let _user =await user.save()
+
     res.cookie('refreshToken', refreshToken, {
         secure: true,
         httpOnly: true,
@@ -107,7 +111,7 @@ export const login = catchAsync(async (req, res) => {
         statusCode: httpStatus.OK,
         success: true,
         message: 'User Logged in successfully',
-        data: { accessToken, user, ticket },
+        data: { accessToken, user: _user, ticket},
     });
 
 
@@ -216,6 +220,47 @@ export const changePassword = catchAsync(async (req, res) => {
         data: ""
     })
 })
+
+// Refresh Token
+export const refreshToken = catchAsync(async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        throw new AppError(400, 'Refresh token is required');
+    }
+
+    const decoded = verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET as string) as JwtPayload;
+    const user = await User.findById(decoded.id);
+    if (!user || user.refreshToken !== refreshToken) {
+        throw new AppError(401, 'Invalid refresh token');
+    }
+        const jwtPayload = {
+        _id: user._id,
+        email: user.email,
+        role: user.role,
+    };
+
+    const accessToken = createToken(
+        jwtPayload,
+        process.env.JWT_ACCESS_SECRET as string,
+        process.env.JWT_ACCESS_EXPIRES_IN as string,
+    );
+
+    const refreshToken1 = createToken(
+        jwtPayload,
+        process.env.JWT_REFRESH_SECRET as string,
+        process.env.JWT_REFRESH_EXPIRES_IN as string,
+    );
+    user.refreshToken = refreshToken1;
+    await user.save();
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Token refreshed successfully',
+        data: { accessToken: accessToken, refreshToken: refreshToken1 },
+    });
+});
 
 
 
