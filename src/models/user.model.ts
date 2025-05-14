@@ -35,7 +35,7 @@ userSchema.pre('save', async function (next) {
   const user = this as any;
 
   // Hash password 
-  if (user.password) {
+  if (user.isModified('password')) {
     const saltRounds = Number(process.env.bcrypt_salt_round) || 10;
     let pass =  user.password
       user.password = await bcrypt.hash(
