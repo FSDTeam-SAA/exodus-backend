@@ -4,18 +4,19 @@ import AppError from '../errors/AppError'
 import { User } from '../models/user.model'
 import catchAsync from '../utils/catchAsync'
 import { uploadToCloudinary } from '../utils/cloudinary'
+import { Schedule } from '../models/schedule.model'
+import sendResponse from '../utils/sendResponse'
 
-interface IDriverRequestBody {
-  name: string
-  email: string
-  phone?: string
-  password: string
-  username?: string
-}
+// interface IDriverRequestBody {
+//   name: string
+//   email: string
+//   phone?: string
+//   password: string
+//   username?: string
+// }
 // create driver
-export const addDriver = catchAsync(async (req: Request, res: Response) => {
-  const { name, email, phone, password, username } =
-    req.body as IDriverRequestBody
+export const addDriver = catchAsync(async (req, res) => {
+  const { name, email, phone, password, username } = req.body
 
   // Validate required fields
   if (!name || !email || !password) {
@@ -94,34 +95,39 @@ export const addDriver = catchAsync(async (req: Request, res: Response) => {
   delete (driverResponse as any).password_reset_token
   delete (driverResponse as any).verificationInfo
 
-  res.status(httpStatus.CREATED).json({
+  // res.status(httpStatus.CREATED).json({
+  //   success: true,
+  //   message: 'Driver created successfully',
+  //   data: {
+  //     driver: driverResponse,
+  //   },
+  // })
+    sendResponse( res,{
+    statusCode: httpStatus.OK,
     success: true,
     message: 'Driver created successfully',
-    data: {
-      driver: driverResponse,
-    },
+    data:  driverResponse
   })
 })
 
 // get all the drivers
-export const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
+export const getAllDrivers = catchAsync(async (req, res) => {
   const drivers = await User.find({ role: 'driver' }).select('-password -password_reset_token -verificationInfo')
 
   if (!drivers || drivers.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, 'No drivers found')
   }
 
-  res.status(httpStatus.OK).json({
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
     success: true,
-    message: 'Drivers fetched successfully',
-    data: {
-      drivers,
-    },
+    message: 'Drivers retrieved successfully',
+    data: drivers
   })
 })
 
 // update driver info
-export const updateDriver = catchAsync(async (req: Request, res: Response) => {
+export const updateDriver = catchAsync(async (req, res) => {
   const { id, name, email, phone, username } = req.body
 
   if (!id) {
@@ -149,17 +155,16 @@ export const updateDriver = catchAsync(async (req: Request, res: Response) => {
   delete (updatedDriver as any).password_reset_token
   delete (updatedDriver as any).verificationInfo
 
-  res.status(httpStatus.OK).json({
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
     success: true,
     message: 'Driver updated successfully',
-    data: {
-      driver: updatedDriver,
-    },
+    data: updatedDriver
   })
 })
 
 // delete driver
-export const deleteDriver = catchAsync(async (req: Request, res: Response) => {
+export const deleteDriver = catchAsync(async (req, res) => {
   const driverId = req.params.id
 
   const driver = await User.findOneAndDelete({ _id: driverId, role: 'driver' })
@@ -168,8 +173,74 @@ export const deleteDriver = catchAsync(async (req: Request, res: Response) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Driver not found or already deleted')
   }
 
-  res.status(httpStatus.OK).json({
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
     success: true,
     message: 'Driver deleted successfully',
+    data: ""
   })
 })
+
+
+
+export const driverScheduledTrips = catchAsync(async (req, res) => {
+  const driverId = req.user?._id;
+
+  if (!driverId) {
+    throw new AppError(401, 'Unauthorized');
+  }
+
+  const now = new Date();
+
+  // Day like 'Mon', 'Tue', etc.
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const currentDay = dayNames[now.getDay()];
+
+  const schedules = await Schedule.find({ driverId, isActive: true }).populate('busId');
+  // console.log( 'schedules', schedules );
+
+  const currentTrips: any[] = [];
+  const upcomingTrips: any[] = [];
+
+  for (const schedule of schedules) {
+    for (const daySchedule of schedule.schedules) {
+      if (daySchedule.day !== currentDay) continue; // Skip if not today
+
+      const [depHour, depMin] = daySchedule.departureTime.split(':').map(Number);
+      const departureTime = new Date(now);
+      departureTime.setHours(depHour, depMin, 0, 0);
+
+      const [arrHour, arrMin] = daySchedule.arrivalTime
+        ? daySchedule.arrivalTime.split(':').map(Number)
+        : [depHour + 1, depMin];
+
+      const arrivalTime = new Date(now);
+      arrivalTime.setHours(arrHour, arrMin, 0, 0);
+
+      const bus:any = schedule.busId;
+
+      const tripInfo = {
+        day: daySchedule.day,
+        departureTime: daySchedule.departureTime,
+        arrivalTime: daySchedule.arrivalTime,
+        source: bus.source,
+        destination: bus.lastStop,
+        busName: bus.name,
+        busNumber: bus.bus_number,
+      };
+      // console.log( departureTime, "dsjfhdshfjsdkjsdfhkshkjsdhsdfkjh", now );
+
+
+      upcomingTrips.push(tripInfo);
+    }
+  }
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Trips found',
+    data: upcomingTrips
+  })
+});
+
+
