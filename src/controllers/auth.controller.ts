@@ -69,17 +69,6 @@ export const login = catchAsync(async (req, res) => {
     if (! await User.isOTPVerified(user._id)) {
         throw new AppError(httpStatus.FORBIDDEN, 'OTP is not verified')
     }
-    let ticket;
-    // if(user.role !== "admin" && user.role !== "driver"){
-
-    ticket = await Ticket.find({
-        userId: user._id, ride: "pending",
-        $or: [
-            { status: "accpeted" },
-            { status: "booked" }
-        ]
-    }).select("-avaiableSeat")
-    // }
     const jwtPayload = {
         _id: user._id,
         email: user.email,
@@ -111,7 +100,31 @@ export const login = catchAsync(async (req, res) => {
         statusCode: httpStatus.OK,
         success: true,
         message: 'User Logged in successfully',
-        data: { accessToken, user: _user, ticket},
+        data: { accessToken, refreshToken: refreshToken, },
+    });
+
+
+
+})
+
+
+export const UserData = catchAsync(async (req, res) => {
+    let ticket;
+    if(req.user?.role !== "admin" && req.user?.role !== "driver"){
+
+    ticket = await Ticket.find({
+        userId: req.user?._id, ride: "pending",
+        $or: [
+            { status: "accpeted" },
+            { status: "booked" }
+        ]
+    }).select("-avaiableSeat")
+    }
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'User Data Fetch successfully',
+        data: { user: req.user, ticket},
     });
 
 
@@ -261,6 +274,19 @@ export const refreshToken = catchAsync(async (req, res) => {
         data: { accessToken: accessToken, refreshToken: refreshToken1 },
     });
 });
+
+
+
+export const logout = catchAsync(async (req, res) =>{
+    const user = req.user?._id;
+    const user1 = await User.findByIdAndUpdate(user, { refreshToken: '' }, { new: true });
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Logged out successfully',
+        data: ""
+        });
+})
 
 
 
