@@ -113,11 +113,7 @@ export const UserData = catchAsync(async (req, res) => {
     if(req.user?.role !== "admin" && req.user?.role !== "driver"){
 
     ticket = await Ticket.find({
-        userId: req.user?._id, ride: "pending",
-        $or: [
-            { status: "accpeted" },
-            { status: "booked" }
-        ]
+        userId: req.user?._id, ride: "pending"
     }).select("-avaiableSeat")
     }
     sendResponse(res, {
