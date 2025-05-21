@@ -90,7 +90,7 @@ export const createTicket = catchAsync(async (req, res) => {
       time: time,
     }).sort("-createdAt");
 
-    if (isSeatTaken) {
+    if (isSeatTaken.length > 0) {
       totalSeat = isSeatTaken[0].avaiableSeat
       if (!totalSeat.includes(seatNumber.toString())) {
         throw new AppError(400, 'Seat is already taken')
