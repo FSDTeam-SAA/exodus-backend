@@ -100,7 +100,7 @@ export const login = catchAsync(async (req, res) => {
         statusCode: httpStatus.OK,
         success: true,
         message: 'User Logged in successfully',
-        data: { accessToken, refreshToken: refreshToken, },
+        data: { accessToken, refreshToken: refreshToken, role: user.role },
     });
 
 

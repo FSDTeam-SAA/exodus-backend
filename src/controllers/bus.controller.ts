@@ -167,6 +167,10 @@ export const getAvailableBuses = catchAsync(async (req, res) => {
   const travelDate = new Date(date as string);
   const today = new Date();
   const isToday = travelDate.toDateString() === today.toDateString();
+
+  if(travelDate< today){
+    throw new AppError(httpStatus.BAD_REQUEST, 'Travel date should be greater than today');
+  }
   const dayOfWeek = travelDate.toLocaleDateString('en-US', { weekday: 'short' }); // e.g., "Sun"
 
   const buses = await Bus.find().lean();
