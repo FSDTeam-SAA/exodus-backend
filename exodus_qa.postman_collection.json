@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "1c865168-7bf7-454b-8940-0d95b7d7dc61",
+		"_postman_id": "e7575fab-a3ad-488b-8836-08c3a0785351",
 		"name": "exodus_qa",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "44713219",
-		"_collection_link": "https://luxe-blooms.postman.co/workspace/exodus-backend~e0237c82-492c-4cae-98e8-7ed3380af651/collection/44713219-1c865168-7bf7-454b-8940-0d95b7d7dc61?action=share&source=collection_link&creator=44713219"
+		"_exporter_id": "44521628",
+		"_collection_link": "https://orange-sunset-3739107.postman.co/workspace/Gazi-Fuad-Md.-Tahsin's-Workspac~eacfad10-b8f6-4e28-88fd-ad7667748367/collection/44521628-e7575fab-a3ad-488b-8836-08c3a0785351?action=share&source=collection_link&creator=44521628"
 	},
 	"item": [
 		{
@@ -799,7 +799,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}/bus/get-available-bus?from=C&to=dhaka&date=2025-05-16T08:00:00",
+									"raw": "{{BASE_URL}}/bus/get-available-bus?from=C&to=dhaka&date=2025-05-24T08:00:00",
 									"host": [
 										"{{BASE_URL}}"
 									],
@@ -818,7 +818,7 @@
 										},
 										{
 											"key": "date",
-											"value": "2025-05-16T08:00:00"
+											"value": "2025-05-24T08:00:00"
 										}
 									]
 								}
@@ -1006,6 +1006,98 @@
 									],
 									"cookie": [],
 									"body": "{\n    \"success\": true,\n    \"message\": \"Bus retrieved successfully\",\n    \"data\": {\n        \"bus\": {\n            \"_id\": \"681ee03a348ec90d5d5d35f6\",\n            \"name\": \"semolui\",\n            \"bus_number\": \"5444545\",\n            \"seat\": 20,\n            \"standing\": 10,\n            \"source\": \"dhaka\",\n            \"stops\": [\n                {\n                    \"name\": \"dhaka\",\n                    \"_id\": \"681ee03a348ec90d5d5d35f7\"\n                },\n                {\n                    \"name\": \"A\",\n                    \"_id\": \"681ee03a348ec90d5d5d35f8\"\n                },\n                {\n                    \"name\": \"B\",\n                    \"_id\": \"681ee03a348ec90d5d5d35f9\"\n                },\n                {\n                    \"name\": \"C\",\n                    \"_id\": \"681ee03a348ec90d5d5d35fa\"\n                },\n                {\n                    \"name\": \"narayanganj\",\n                    \"_id\": \"681ee03a348ec90d5d5d35fb\"\n                }\n            ],\n            \"lastStop\": \"narayanganj\",\n            \"price\": 100,\n            \"createdAt\": \"2025-05-10T05:12:26.212Z\",\n            \"updatedAt\": \"2025-05-10T05:12:26.212Z\",\n            \"__v\": 0\n        },\n        \"avaiableSeat\": [\n            \"A2\",\n            \"A3\",\n            \"A4\",\n            \"B1\",\n            \"B2\",\n            \"B3\",\n            \"B4\",\n            \"C1\",\n            \"C2\",\n            \"C3\",\n            \"C4\",\n            \"D1\",\n            \"D2\",\n            \"D3\",\n            \"D4\",\n            \"E1\",\n            \"E2\",\n            \"E3\",\n            \"E4\"\n        ]\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get All Bus Route",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/users/get-bus-route",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"users",
+										"get-bus-route"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "All Bus Route",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/users/get-bus-route",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"users",
+												"get-bus-route"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "119"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"77-tKMJc84Njo+S9XvjXwgP5PWaeDo\""
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 24 May 2025 05:02:03 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"success\": true,\n    \"message\": \"Get all bus route\",\n    \"data\": [\n        \"dhaka\",\n        \"A\",\n        \"B\",\n        \"C\",\n        \"narayanganj\",\n        \"dhaka\",\n        \"H\",\n        \"B\",\n        \"J\",\n        \"cummila\"\n    ]\n}"
 								}
 							]
 						}
@@ -1370,7 +1462,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"seatNumber\": \"standing\",\r\n    \"busNumber\": \"681ee03a348ec90d5d5d35f6\",\r\n    \"source\": \"A\",\r\n    \"destination\": \"narayanganj\",\r\n    \"date\": \"2025-05-16T09:00:00\"\r\n}",
+									"raw": "{\r\n    \"seatNumber\": \"A1\",\r\n    \"busNumber\": \"681ee03a348ec90d5d5d35f6\",\r\n    \"source\": \"A\",\r\n    \"destination\": \"narayanganj\",\r\n    \"date\": \"2025-05-23T08:00:00\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2372,7 +2464,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"semolui\",\r\n    \"bus_number\": \"5444545\",\r\n    \"seat\": 20,\r\n    \"standing\": 10,\r\n    \"source\": \"dhaka\",\r\n    \"stops\": [\r\n        {\r\n            \"name\": \"dhaka\"\r\n        },\r\n        {\r\n            \"name\": \"A\"\r\n        },\r\n        {\r\n            \"name\": \"B\"\r\n        },\r\n        {\r\n            \"name\": \"C\"\r\n        },\r\n        {\r\n            \"name\": \"narayanganj\"\r\n        }\r\n    ],\r\n    \"lastStop\": \"narayanganj\",\r\n    \"price\": 100\r\n}",
+									"raw": "{\r\n    \"name\": \"semoluid\",\r\n    \"bus_number\": \"5444545\",\r\n    \"seat\": 20,\r\n    \"standing\": 10,\r\n    \"source\": \"dhaka\",\r\n    \"stops\": [\r\n        {\r\n            \"name\": \"dhaka\"\r\n        },\r\n        {\r\n            \"name\": \"H\"\r\n        },\r\n        {\r\n            \"name\": \"B\"\r\n        },\r\n        {\r\n            \"name\": \"J\"\r\n        },\r\n        {\r\n            \"name\": \"cummila\"\r\n        }\r\n    ],\r\n    \"lastStop\": \"cumilla\",\r\n    \"price\": 100\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2670,24 +2762,6 @@
 					""
 				]
 			}
-		}
-	],
-	"variable": [
-		{
-			"key": "BASE_URL",
-			"value": "localhost:5000",
-			"type": "default"
-		},
-		{
-			"key": "baseUrl",
-			"value": "",
-			"type": "default",
-			"disabled": true
-		},
-		{
-			"key": "baseUrl",
-			"value": "",
-			"type": "default"
 		}
 	]
 }
