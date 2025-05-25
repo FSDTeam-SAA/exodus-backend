@@ -10,6 +10,7 @@ import scheduleRoutes from './routes/schedule.routes'
 import ticketRoutes from './routes/ticket.routes'
 import subscriptionRoutes from './routes/subscription.routes'
 import reserveBusRoutes from './routes/reserveBus.routes'
+import cors from 'cors'
 
 import dashboardRoutes from './routes/dashboard.routes'
 import { createServer } from 'http'
@@ -17,6 +18,7 @@ import { Server } from 'socket.io'
 const app = express()
 
 app.use(express.json())
+app.use(cors({ origin: '*' }))
 const server = createServer(app);
 const io = new Server(server, {
 });
@@ -46,11 +48,11 @@ app.use('/api/v1/ticket', ticketRoutes)
 app.use('/api/v1', subscriptionRoutes)
 
 /**---------------------- Bus reserve Route -------------------------- */
-app.use('/api/v1', reserveBusRoutes )
+app.use('/api/v1', reserveBusRoutes)
 
 
 /**---------------------- Admin dashboard Route -------------------------- */
-app.use('/api/v1', dashboardRoutes )
+app.use('/api/v1', dashboardRoutes)
 
 
 // app.use(errorMiddleware)
@@ -77,4 +79,4 @@ io.on('connection', (socket) => {
     });
 });
 
-export {app,server,io}
+export { app, server, io }
