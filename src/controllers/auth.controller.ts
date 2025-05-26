@@ -84,7 +84,7 @@ export const login = catchAsync(async (req, res) => {
             statusCode: httpStatus.FORBIDDEN,
             success: false,
             message: 'OTP is not verified, please verify your OTP',
-            data: user.email
+            data: {email: user.email}
         })
     }
     const jwtPayload = {
