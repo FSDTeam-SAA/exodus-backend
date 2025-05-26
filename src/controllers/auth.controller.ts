@@ -11,8 +11,8 @@ import { sendEmail } from "../utils/sendEmail";
 
 
 export const register = catchAsync(async (req, res) => {
-    const { name, email, password, phone,username } = req.body;
-    if (!name || !email || !password ) {
+    const { name, email, password, phone, username } = req.body;
+    if (!name || !email || !password) {
         throw new AppError(httpStatus.FORBIDDEN, 'Please fill in all fields')
     }
     const otp = generateOTP()
@@ -67,7 +67,25 @@ export const login = catchAsync(async (req, res) => {
         throw new AppError(httpStatus.FORBIDDEN, 'Password is not correct');
     }
     if (! await User.isOTPVerified(user._id)) {
-        throw new AppError(httpStatus.FORBIDDEN, 'OTP is not verified')
+        const otp = generateOTP()
+        const jwtPayloadOTP = {
+            otp: otp,
+        };
+
+        const otptoken = createToken(jwtPayloadOTP,
+            process.env.OTP_SECRET as string,
+            process.env.OTP_EXPIRE,
+        )
+        user.verificationInfo.token = otptoken
+        await user.save()
+        await sendEmail(user.email, 'Registerd Account', `Your OTP is ${otp}`)
+
+        sendResponse(res, {
+            statusCode: httpStatus.FORBIDDEN,
+            success: false,
+            message: 'OTP is not verified, please verify your OTP',
+            data: user.email
+        })
     }
     const jwtPayload = {
         _id: user._id,
@@ -87,7 +105,7 @@ export const login = catchAsync(async (req, res) => {
     );
 
     user.refreshToken = refreshToken;
-    let _user =await user.save()
+    let _user = await user.save()
 
     res.cookie('refreshToken', refreshToken, {
         secure: true,
@@ -110,17 +128,17 @@ export const login = catchAsync(async (req, res) => {
 
 export const UserData = catchAsync(async (req, res) => {
     let ticket;
-    if(req.user?.role !== "admin" && req.user?.role !== "driver"){
+    if (req.user?.role !== "admin" && req.user?.role !== "driver") {
 
-    ticket = await Ticket.find({
-        userId: req.user?._id, status: "pending"
-    }).select("-avaiableSeat")
+        ticket = await Ticket.find({
+            userId: req.user?._id, status: "pending"
+        }).select("-avaiableSeat")
     }
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: 'User Data Fetch successfully',
-        data: { user: req.user, ticket},
+        data: { user: req.user, ticket },
     });
 
 
@@ -154,7 +172,7 @@ export const forgetPassword = catchAsync(async (req, res) => {
 })
 
 export const resetPassword = catchAsync(async (req, res) => {
-    const { password, otp,email } = req.body;
+    const { password, otp, email } = req.body;
     const user = await User.isUserExistsByEmail(email)
     if (!user) {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found')
@@ -243,7 +261,7 @@ export const refreshToken = catchAsync(async (req, res) => {
     if (!user || user.refreshToken !== refreshToken) {
         throw new AppError(401, 'Invalid refresh token');
     }
-        const jwtPayload = {
+    const jwtPayload = {
         _id: user._id,
         email: user.email,
         role: user.role,
@@ -273,7 +291,7 @@ export const refreshToken = catchAsync(async (req, res) => {
 
 
 
-export const logout = catchAsync(async (req, res) =>{
+export const logout = catchAsync(async (req, res) => {
     const user = req.user?._id;
     const user1 = await User.findByIdAndUpdate(user, { refreshToken: '' }, { new: true });
     sendResponse(res, {
@@ -281,7 +299,7 @@ export const logout = catchAsync(async (req, res) =>{
         success: true,
         message: 'Logged out successfully',
         data: ""
-        });
+    });
 })
 
 
