@@ -81,8 +81,8 @@ export const login = catchAsync(async (req, res) => {
         await sendEmail(user.email, 'Registerd Account', `Your OTP is ${otp}`)
 
         sendResponse(res, {
-            statusCode: httpStatus.FORBIDDEN,
-            success: false,
+            statusCode: httpStatus.OK,
+            success: true,
             message: 'OTP is not verified, please verify your OTP',
             data: {email: user.email}
         })
