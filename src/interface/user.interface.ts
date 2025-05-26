@@ -11,7 +11,8 @@ export interface IUser extends Document {
   verificationInfo: {
     verified: boolean
     token: string
-  }
+  },
+  phone: string
   avatar?: {
     public_id: string
     url: string

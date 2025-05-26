@@ -85,6 +85,9 @@ export const addDriver = catchAsync(async (req, res) => {
     phone: phone || undefined,
     password,
     username: generatedUsername,
+    verificationInfo: {
+      verified: true
+    },
     avatar,
     role: 'driver',
   })
@@ -102,17 +105,38 @@ export const addDriver = catchAsync(async (req, res) => {
   //     driver: driverResponse,
   //   },
   // })
-    sendResponse( res,{
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Driver created successfully',
-    data:  driverResponse
+    data: driverResponse
   })
 })
 
 // get all the drivers
 export const getAllDrivers = catchAsync(async (req, res) => {
-  const drivers = await User.find({ role: 'driver' }).select('-password -password_reset_token -verificationInfo')
+  const { page = '1', limit = '10', search = '' } = req.query;
+
+  const pageNumber = parseInt(page as string, 10) || 1;
+  const limitNumber = parseInt(limit as string, 10) || 10;
+  const skip = (pageNumber - 1) * limitNumber;
+
+  // Build search filter
+  const searchFilter = search
+    ? {
+      role: 'driver',
+      $or: [
+        { name: { $regex: search, $options: 'i' } },
+        {  email: { $regex: search, $options: 'i' } },
+        {  username: { $regex: search, $options: 'i' } },
+        {  phone: { $regex: search, $options: 'i' } },
+      ],
+    }
+    : {role: 'driver',};
+
+  const total = await User.countDocuments(searchFilter);
+
+  const drivers = await User.find(searchFilter).select('-password -password_reset_token -verificationInfo -refreshToken')
 
   if (!drivers || drivers.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, 'No drivers found')
@@ -122,7 +146,14 @@ export const getAllDrivers = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Drivers retrieved successfully',
-    data: drivers
+    data: {drivers,
+            pagination: {
+        total,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: Math.ceil(total / limitNumber),
+      }
+    }
   })
 })
 
@@ -217,7 +248,7 @@ export const driverScheduledTrips = catchAsync(async (req, res) => {
       const arrivalTime = new Date(now);
       arrivalTime.setHours(arrHour, arrMin, 0, 0);
 
-      const bus:any = schedule.busId;
+      const bus: any = schedule.busId;
 
       const tripInfo = {
         day: daySchedule.day,
