@@ -5,7 +5,7 @@ const ticketSchema = new Schema<ITicket>({
   schedule: { type: Schema.Types.ObjectId, ref: 'Schedule' },
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
   price: { type: Number, required: true },
-  busNumber: { type: Schema.Types.ObjectId, required: true },
+  busNumber: { type: Schema.Types.ObjectId, ref: 'Bus',required: true },
   seatNumber: { type: String, required: true },
   source: { type: String, required: true },
   destination: { type: String, required: true },

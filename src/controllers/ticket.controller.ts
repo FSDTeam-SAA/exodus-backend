@@ -166,7 +166,7 @@ export const getAllTicket = catchAsync(async (req, res) => {
   const departureDateTime = new Date(date as string);
   departureDateTime.setHours(hour, minute, 0, 0);
 
-  const ticket = await Ticket.find({ busNumber, date: departureDateTime, time }).select("-qrCode -avaiableSeat");
+  const ticket = await Ticket.find({ busNumber, date: departureDateTime, time }).select("-qrCode -avaiableSeat").populate("busNumber","name")
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Ticket found',
