@@ -115,9 +115,10 @@ export const createTicket = catchAsync(async (req, res) => {
       light: '#ffffff'   // background color (e.g., light peach)
     }
   };
+  const ticket_secret = generateUniqueString()
 
   const qrPayload = {
-    code: generateUniqueString()
+    code: ticket_secret
   };
 
   qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload), qrOptions);
@@ -136,6 +137,7 @@ export const createTicket = catchAsync(async (req, res) => {
     date: departureDateTime,
     time: daySchedule.departureTime,
     qrCode,
+    ticket_secret,
     key,
     avaiableSeat,
   });
@@ -225,8 +227,10 @@ export const scanTicket = catchAsync(async (req, res) => {
     }
   };
 
+  const ticket_secret = generateUniqueString()
+
   const qrPayload = {
-    code: generateUniqueString()
+    code: ticket_secret
   };
 
   const qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload), qrOptions);
@@ -248,6 +252,7 @@ export const scanTicket = catchAsync(async (req, res) => {
   }
   ticket.status = "running"
   ticket.qrCode = qrCode;
+  ticket.ticket_secret = ticket_secret;
   const _ticket = await ticket.save()
 
 
