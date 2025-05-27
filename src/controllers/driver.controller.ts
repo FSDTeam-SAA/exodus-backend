@@ -267,6 +267,7 @@ export const driverScheduledTrips = catchAsync(async (req, res) => {
         totalSeatBooked: toltalSeat,
         totalStandingBooked: toltalStand,
         busId: bus._id,
+        date: departureTime,
       };
       // console.log( departureTime, "dsjfhdshfjsdkjsdfhkshkjsdhsdfkjh", now );
 
