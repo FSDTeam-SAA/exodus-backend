@@ -127,16 +127,16 @@ export const getAllDrivers = catchAsync(async (req, res) => {
       role: 'driver',
       $or: [
         { name: { $regex: search, $options: 'i' } },
-        {  email: { $regex: search, $options: 'i' } },
-        {  username: { $regex: search, $options: 'i' } },
-        {  phone: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { username: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
       ],
     }
-    : {role: 'driver',};
+    : { role: 'driver', };
 
   const total = await User.countDocuments(searchFilter);
 
-  const drivers = await User.find(searchFilter).select('-password -password_reset_token -verificationInfo -refreshToken')
+  const drivers = await User.find(searchFilter).select('-password -password_reset_token -verificationInfo -refreshToken').skip(skip).limit(limitNumber).sort({ createdAt: -1 })
 
   if (!drivers || drivers.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, 'No drivers found')
@@ -146,8 +146,9 @@ export const getAllDrivers = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Drivers retrieved successfully',
-    data: {drivers,
-            pagination: {
+    data: {
+      drivers,
+      pagination: {
         total,
         page: pageNumber,
         limit: limitNumber,

@@ -5,6 +5,7 @@ import httpStatus from 'http-status'
 import catchAsync from '../utils/catchAsync';
 import AppError from '../errors/AppError';
 import sendResponse from '../utils/sendResponse';
+import { Bus } from '../models/bus.model';
 
 
 export const getBookingStats = async (req: Request, res: Response) => {
@@ -39,11 +40,14 @@ export const getBookingStats = async (req: Request, res: Response) => {
 
 export const getTotalUsers = catchAsync(async (req: Request, res: Response) => {
   const totalUsers = await User.countDocuments()
+  const totalBus = await Bus.countDocuments()
+  const totalTickets = await Ticket.countDocuments()
+  const totalCancle = await Ticket.countDocuments({status: 'cancelled'})
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Total user count retrieved successfully',
-    data: { totalUsers },
+    data: { totalUsers,totalBus, totalTickets, totalCancle },
   })
 })

@@ -44,7 +44,7 @@ export const getAllBuses = catchAsync(async (req, res) => {
     : {};
 
   const total = await Bus.countDocuments(searchFilter);
-  const buses = await Bus.find(searchFilter).skip(skip).limit(limitNumber);
+  const buses = await Bus.find(searchFilter).skip(skip).limit(limitNumber).sort({createdAt : -1});
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -104,7 +104,8 @@ export const getBusById = catchAsync(async (req, res) => {
     message: 'Bus retrieved successfully',
     data: {
       bus,
-      avaiableSeat: availableSeat
+      avaiableSeat: availableSeat,
+      totalSeats: generateDefaultSeats(bus.seat)
     },
   });
 

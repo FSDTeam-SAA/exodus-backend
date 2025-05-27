@@ -74,6 +74,16 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on("joinBusLive",(busId)=>{
+        console.log("Client joined bus live room",busId);
+        socket.join(`bus_${busId}`);
+    })
+    // Handle incoming messages
+    socket.on("liveLocation",(data)=>{
+        console.log("Client sent live location",data);
+        io.to(`bus_${data.busId}`).emit("liveLocation",data);
+    })
+
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
     });

@@ -4,7 +4,7 @@
 		"name": "exodus_qa",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "44521628",
-		"_collection_link": "https://orange-sunset-3739107.postman.co/workspace/Gazi-Fuad-Md.-Tahsin's-Workspac~eacfad10-b8f6-4e28-88fd-ad7667748367/collection/44521628-e7575fab-a3ad-488b-8836-08c3a0785351?action=share&source=collection_link&creator=44521628"
+		"_collection_link": "https://orange-sunset-3739107.postman.co/workspace/eacfad10-b8f6-4e28-88fd-ad7667748367/collection/44521628-e7575fab-a3ad-488b-8836-08c3a0785351?action=share&source=collection_link&creator=44521628"
 	},
 	"item": [
 		{
@@ -40,7 +40,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"tahsin.bdcalling@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"raw": "{\r\n    \"email\": \"bdcalling@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}\r\n\r\n// {\r\n//     \"email\": \"noyonbdc787@gmail.com\",\r\n//     \"password\": \"123456\"\r\n// }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -74,11 +74,15 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/auth/login",
+									"raw": "http://localhost:5000/api/v1/auth/login",
+									"protocol": "http",
 									"host": [
-										"{{BASE_URL}}"
+										"localhost"
 									],
+									"port": "5000",
 									"path": [
+										"api",
+										"v1",
 										"auth",
 										"login"
 									]
@@ -167,11 +171,15 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/auth/register",
+									"raw": "http://localhost:5000/api/v1/auth/register",
+									"protocol": "http",
 									"host": [
-										"{{BASE_URL}}"
+										"localhost"
 									],
+									"port": "5000",
 									"path": [
+										"api",
+										"v1",
 										"auth",
 										"register"
 									]
@@ -446,11 +454,15 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/auth/logout",
+									"raw": "http://localhost:5000/api/v1/auth/logout",
+									"protocol": "http",
 									"host": [
-										"{{BASE_URL}}"
+										"localhost"
 									],
+									"port": "5000",
 									"path": [
+										"api",
+										"v1",
 										"auth",
 										"logout"
 									]
@@ -1379,6 +1391,104 @@
 									],
 									"cookie": [],
 									"body": "{\n    \"success\": true,\n    \"message\": \"All notifications marked as read\",\n    \"data\": \"\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Get SIngle User",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"productId\": \"682085fac2b76445d537b125\",\r\n  \"hubCode\": \"41PJSE\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/users/single-user/681ee382b6c64710654417b5",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"users",
+										"single-user",
+										"681ee382b6c64710654417b5"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "SIngle User",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"productId\": \"682085fac2b76445d537b125\",\r\n  \"hubCode\": \"41PJSE\"\r\n}\r\n"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/users/single-user/681ee382b6c64710654417b5",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"users",
+												"single-user",
+												"681ee382b6c64710654417b5"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "781"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"30d-WhxVQRCGpN3dyo6ZSkdMSou0oZc\""
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 27 May 2025 05:44:19 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"success\": true,\n    \"message\": \"Get single user\",\n    \"data\": {\n        \"avatar\": {\n            \"public_id\": \"\",\n            \"url\": \"\"\n        },\n        \"verificationInfo\": {\n            \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvdHAiOiI2MTI0MDgiLCJpYXQiOjE3NDY4NTQ3ODYsImV4cCI6MTc0Njg1ODM4Nn0.oNeL1DktC6SdSHf0c1GbUOMskVEA0ZgX2OgpHDHvT-A\",\n            \"verified\": true\n        },\n        \"_id\": \"681ee382b6c64710654417b5\",\n        \"name\": \"tahsin\",\n        \"email\": \"bdcalling@gmail.com\",\n        \"username\": \"tahsind\",\n        \"credit\": 0,\n        \"role\": \"admin\",\n        \"password_reset_token\": \"\",\n        \"createdAt\": \"2025-05-10T05:26:26.147Z\",\n        \"updatedAt\": \"2025-05-27T05:43:29.362Z\",\n        \"__v\": 0,\n        \"fine\": 0,\n        \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODFlZTM4MmI2YzY0NzEwNjU0NDE3YjUiLCJlbWFpbCI6ImJkY2FsbGluZ0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDgzMjQ2MDksImV4cCI6MTc1NjEwMDYwOX0.igWJW-EngyKKrxJl40tJgiJAi1V1P51AG5Tt8suc0AQ\"\n    }\n}"
 								}
 							]
 						}
@@ -2650,12 +2760,12 @@
 										},
 										{
 											"key": "email",
-											"value": "chagol@gmail.com",
+											"value": "chagol1@gmail.com",
 											"type": "text"
 										},
 										{
 											"key": "phone",
-											"value": "2136565+4210231",
+											"value": "5454545454",
 											"type": "text"
 										},
 										{
@@ -2672,18 +2782,16 @@
 										{
 											"key": "avatar",
 											"type": "file",
-											"src": "/run/user/1000/doc/6309ec33/Screenshot 2025-03-20 at 09-29-17 Treglike.png"
+											"src": "/C:/Users/bdCalling/Downloads/edited-image.png"
 										}
 									]
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/v1/add/driver",
+									"raw": "{{BASE_URL}}/add/driver",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
-										"api",
-										"v1",
 										"add",
 										"driver"
 									]
@@ -2697,15 +2805,19 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}/api/v1/all/drivers",
+									"raw": "{{BASE_URL}}/all/drivers?search=DJ",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
-										"api",
-										"v1",
 										"all",
 										"drivers"
+									],
+									"query": [
+										{
+											"key": "search",
+											"value": "DJ"
+										}
 									]
 								}
 							},
