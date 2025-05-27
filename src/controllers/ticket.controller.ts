@@ -57,18 +57,18 @@ export const createTicket = catchAsync(async (req, res) => {
   if (!daySchedule) {
     throw new AppError(404, 'Schedule not found')
   }
+  // Parse departure time (assuming format is "HH:mm", e.g., "14:30")
+  const [hour, minute] = daySchedule.departureTime.split(':').map(Number);
+  departureDateTime = new Date(travelDate);
+  departureDateTime.setHours(hour, minute, 0, 0);
+  console.log(departureDateTime)
+
 
   // Check if the travel date is in the past
   if (
     travelDate.toDateString() < now.toDateString() ||
     (travelDate.toDateString() === now.toDateString() && daySchedule?.departureTime)
   ) {
-    // Parse departure time (assuming format is "HH:mm", e.g., "14:30")
-    const [hour, minute] = daySchedule.departureTime.split(':').map(Number);
-    departureDateTime = new Date(travelDate);
-    departureDateTime.setHours(hour, minute, 0, 0);
-    console.log(departureDateTime)
-
     if (departureDateTime < now) {
       throw new AppError(400, 'Cannot book ticket for past time');
     }
@@ -143,7 +143,7 @@ export const createTicket = catchAsync(async (req, res) => {
     userId: req.user?._id,
     message: `Ticket for ${bus.name} has been booked successfully`,
     type: "success",
-    });
+  });
   io.to(`user_${req.user?._id}`).emit(notifications.message)
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -212,7 +212,7 @@ export const scanTicket = catchAsync(async (req, res) => {
   if (!ticket) {
     throw new AppError(404, 'Ticket not found')
   }
-  if( ticket.status === 'cancelled' ){
+  if (ticket.status === 'cancelled') {
     throw new AppError(400, 'Ticket is cancelled')
   }
   if (ticket.ticket_secret !== secret) {
@@ -255,7 +255,7 @@ export const scanTicket = catchAsync(async (req, res) => {
     userId: _ticket.userId,
     message: `Congratulation You ${_ticket.status} the ${bus?.name} ride`,
     type: "success",
-    });
+  });
   io.to(`user_${_ticket.userId}`).emit(notifications.message)
 
   sendResponse(res, {
@@ -314,8 +314,8 @@ export const cancelTicket = catchAsync(async (req, res) => {
     const fine = ticket.price * 0.1;
     const refund = ticket.price - fine;
 
-    const userId = await User.findById({_id: ticket.userId})
-    if(!userId){
+    const userId = await User.findById({ _id: ticket.userId })
+    if (!userId) {
       throw new AppError(404, 'User not found')
     }
 
@@ -329,11 +329,11 @@ export const cancelTicket = catchAsync(async (req, res) => {
     await ticket.save();
 
     const notifications = await Notification.create({
-    userId: req.user?._id,
-    message: `Cancelation successfully, cancellation fee equating to 10%`,
-    type: "success",
+      userId: req.user?._id,
+      message: `Cancelation successfully, cancellation fee equating to 10%`,
+      type: "success",
     });
-  io.to(`user_${req.user?._id}`).emit(notifications.message)
+    io.to(`user_${req.user?._id}`).emit(notifications.message)
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
