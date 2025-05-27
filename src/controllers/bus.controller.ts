@@ -104,7 +104,8 @@ export const getBusById = catchAsync(async (req, res) => {
     message: 'Bus retrieved successfully',
     data: {
       bus,
-      avaiableSeat: availableSeat
+      avaiableSeat: availableSeat,
+      totalSeats: generateDefaultSeats(bus.seat)
     },
   });
 
