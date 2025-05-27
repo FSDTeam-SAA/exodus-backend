@@ -6,6 +6,7 @@ import catchAsync from '../utils/catchAsync'
 import { uploadToCloudinary } from '../utils/cloudinary'
 import { Schedule } from '../models/schedule.model'
 import sendResponse from '../utils/sendResponse'
+import { Ticket } from '../models/ticket.model'
 
 // interface IDriverRequestBody {
 //   name: string
@@ -222,7 +223,7 @@ export const driverScheduledTrips = catchAsync(async (req, res) => {
     throw new AppError(401, 'Unauthorized');
   }
 
-  const now = new Date();
+  const now = new Date("2025-05-28T08:00:00");
 
   // Day like 'Mon', 'Tue', etc.
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -250,6 +251,8 @@ export const driverScheduledTrips = catchAsync(async (req, res) => {
       arrivalTime.setHours(arrHour, arrMin, 0, 0);
 
       const bus: any = schedule.busId;
+      const toltalStand =  await Ticket.countDocuments({busNumber: bus._id, date: departureTime, seatNumber: "standing" });
+      const toltalSeat =  await Ticket.countDocuments({busNumber: bus._id, date: departureTime, seatNumber: {$ne:"standing"} });
 
       const tripInfo = {
         day: daySchedule.day,
@@ -259,13 +262,21 @@ export const driverScheduledTrips = catchAsync(async (req, res) => {
         destination: bus.lastStop,
         busName: bus.name,
         busNumber: bus.bus_number,
+        totalSeat: bus.seat,
+        totalStanding: bus.standing,
+        totalSeatBooked: toltalSeat,
+        totalStandingBooked: toltalStand,
+        busId: bus._id,
       };
       // console.log( departureTime, "dsjfhdshfjsdkjsdfhkshkjsdhsdfkjh", now );
 
 
+      
+      // console.log ( 'toltalSeat', toltalSeat );
       upcomingTrips.push(tripInfo);
     }
   }
+
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
