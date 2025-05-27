@@ -84,7 +84,7 @@ export const login = catchAsync(async (req, res) => {
             statusCode: httpStatus.FORBIDDEN,
             success: false,
             message: 'OTP is not verified, please verify your OTP',
-            data: {email: user.email}
+            data: { email: user.email }
         })
     }
     const jwtPayload = {
@@ -152,10 +152,14 @@ export const forgetPassword = catchAsync(async (req, res) => {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found')
     }
     const otp = generateOTP()
+    const jwtPayloadOTP = {
+        otp: otp,
+    };
 
-    const otptoken = createToken(otp,
+    const otptoken = createToken(
+        jwtPayloadOTP,
         process.env.OTP_SECRET as string,
-        '1h' as string,
+        process.env.OTP_EXPIRE as string,
     )
     user.password_reset_token = otptoken
     await user.save()
