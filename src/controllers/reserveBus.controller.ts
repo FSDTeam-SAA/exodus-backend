@@ -44,12 +44,19 @@ export const createReserveBus = catchAsync(async (req, res) => {
     reservedBy,
     status,
   })
+  const admin = await User.findOne({role: "admin"})
     const notifications = await Notification.create({
     userId: req.user?._id,
     message: `Bus Reserved Application Successfully Done`,
     type: "success",
     });
+    const notificationss = await Notification.create({
+    userId: admin?._id,
+    message: `New Bus Reserved Application Has Submetted`,
+    type: "success",
+    });
   io.to(`user_${req.user?._id}`).emit(notifications.message)
+  io.to(`user_${admin?._id}`).emit(notifications.message)
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
