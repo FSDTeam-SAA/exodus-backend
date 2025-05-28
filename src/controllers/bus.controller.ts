@@ -6,6 +6,7 @@ import AppError from '../errors/AppError';
 import { Schedule } from '../models/schedule.model';
 import { Ticket } from '../models/ticket.model';
 import { generateDefaultSeats } from '../interface/bus.interface';
+import { console } from 'inspector';
 
 // Create Bus
 export const createBus = catchAsync(async (req, res) => {
@@ -194,7 +195,7 @@ export const getAvailableBuses = catchAsync(async (req, res) => {
   }).populate('busId');
 
   // Filter schedules if today and departure time has passed
-  // if (isToday) {
+  if (isToday) {
     const currentTime = `${travelDate.getHours().toString().padStart(2, '0')}:${travelDate.getMinutes().toString().padStart(2, '0')}`;
   console.log(currentTime)
     schedules = schedules.filter(schedule =>
@@ -202,7 +203,7 @@ export const getAvailableBuses = catchAsync(async (req, res) => {
         s.day === dayOfWeek && s.departureTime > currentTime
       )
     );
-  // }
+  }
 
   // Map filtered schedules back to buses
   const filteredBuses = schedules.map(schedule => {
