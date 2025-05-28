@@ -9,7 +9,8 @@
     "lint": "eslint . --ext .ts",
     "start": "node dist/server.js",
     "start:dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "build-and-start": "npm run build && npm start"
   },
   "keywords": [],
   "author": "",
