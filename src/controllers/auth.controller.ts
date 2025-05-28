@@ -240,10 +240,13 @@ export const changePassword = catchAsync(async (req, res) => {
     if (oldPassword === newPassword) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Old password and new password cannot be same')
     }
-    const user = await User.findByIdAndUpdate({ _id: req.user?._id }, { password: newPassword }, { new: true })
+    const user = await User.findById({ _id: req.user?._id })
+
     if (!user) {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found')
     }
+   user.password =  newPassword;
+   await user.save()
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,

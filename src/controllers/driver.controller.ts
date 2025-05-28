@@ -167,7 +167,7 @@ export const updateDriver = catchAsync(async (req, res) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Driver ID is required')
   }
 
-  const driver = await User.findOne({ _id: id, role: 'driver' })
+  const driver = await User.findOne({ _id: id })
 
   if (!driver) {
     throw new AppError(httpStatus.NOT_FOUND, 'Driver not found')

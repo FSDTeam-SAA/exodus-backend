@@ -6,6 +6,7 @@ import AppError from '../errors/AppError';
 import { Schedule } from '../models/schedule.model';
 import { Ticket } from '../models/ticket.model';
 import { generateDefaultSeats } from '../interface/bus.interface';
+import { console } from 'inspector';
 
 // Create Bus
 export const createBus = catchAsync(async (req, res) => {
@@ -161,6 +162,8 @@ export const deleteBus = catchAsync(async (req, res) => {
 export const getAvailableBuses = catchAsync(async (req, res) => {
   const { from, to, date } = req.query;
 
+  console.log(date);
+
   if (!from || !to || !date) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Please provide from, to and date');
   }
@@ -194,25 +197,35 @@ export const getAvailableBuses = catchAsync(async (req, res) => {
   }).populate('busId');
 
   // Filter schedules if today and departure time has passed
-  // if (isToday) {
+  if (isToday) {
     const currentTime = `${travelDate.getHours().toString().padStart(2, '0')}:${travelDate.getMinutes().toString().padStart(2, '0')}`;
-  console.log(currentTime)
     schedules = schedules.filter(schedule =>
       schedule.schedules.some((s: any) =>
         s.day === dayOfWeek && s.departureTime > currentTime
       )
     );
-  // }
+  }
 
   // Map filtered schedules back to buses
   const filteredBuses = schedules.map(schedule => {
-  const filteredSchedule = schedule.schedules.find(
+
+   let filteredSchedule = schedule.schedules.find(
     (s: any) => s.day === dayOfWeek
   );
+  const [depHour, depMin] = schedule?.schedules[0].departureTime.split(':').map(Number);
+    const departureTime = new Date(travelDate);
+    departureTime.setHours(depHour, depMin, 0, 0);
+  const data ={
+    day: filteredSchedule?.day,
+    arrivalTime: filteredSchedule?.arrivalTime,
+    departureTime: filteredSchedule?.departureTime,
+    date: departureTime
+  }
+
 
   return {
     ...schedule.toObject(),
-    schedules: [filteredSchedule],
+    schedules: data ,
   };
 });
 
