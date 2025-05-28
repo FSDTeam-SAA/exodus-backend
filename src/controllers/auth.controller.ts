@@ -118,7 +118,7 @@ export const login = catchAsync(async (req, res) => {
         statusCode: httpStatus.OK,
         success: true,
         message: 'User Logged in successfully',
-        data: { accessToken, refreshToken: refreshToken, role: user.role ,_id: user._id},
+        data: { accessToken, refreshToken: refreshToken, role: user.role ,_id: user._id},  
     });
 
 
