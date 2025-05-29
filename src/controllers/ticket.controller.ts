@@ -22,6 +22,8 @@ export const createTicket = catchAsync(async (req, res) => {
     date,
   } = req.body;
 
+  console.log(req.body);
+
   const bus = await Bus.findById(busNumber);
 
   if (!bus) {
@@ -117,11 +119,7 @@ export const createTicket = catchAsync(async (req, res) => {
   };
   const ticket_secret = generateUniqueString()
 
-  const qrPayload = {
-    code: ticket_secret
-  };
 
-  qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload), qrOptions);
   //  status = "booked"
   // }
 
@@ -136,11 +134,22 @@ export const createTicket = catchAsync(async (req, res) => {
     destination,
     date: departureDateTime,
     time: daySchedule.departureTime,
-    qrCode,
     ticket_secret,
     key,
     avaiableSeat,
   });
+
+  console.log(ticket);
+
+  const qrPayload = {
+    id: ticket._id,
+    code: ticket_secret
+  };
+
+  qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload), qrOptions);
+  ticket.qrCode = qrCode;
+  let _ticket = await ticket.save();
+
   const notifications = await Notification.create({
     userId: req.user?._id,
     message: `Ticket for ${bus.name} has been booked successfully`,
@@ -151,7 +160,7 @@ export const createTicket = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     message: 'Ticket created successfully',
     success: true,
-    data: ticket,
+    data: _ticket,
   })
 });
 
@@ -208,8 +217,8 @@ export const accpeteOrRejectStanding = catchAsync(async (req, res) => {
 })
 
 export const scanTicket = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const { secret, stationName } = req.body;
+
+  const { id,secret, stationName } = req.body;
   const ticket = await Ticket.findById(id)
   if (!ticket) {
     throw new AppError(404, 'Ticket not found')
@@ -218,6 +227,7 @@ export const scanTicket = catchAsync(async (req, res) => {
     throw new AppError(400, 'Ticket is cancelled')
   }
   if (ticket.ticket_secret !== secret) {
+    console.log("Scan ->>");
     throw new AppError(401, 'Invalid QR code')
   }
   const qrOptions = {
@@ -230,6 +240,7 @@ export const scanTicket = catchAsync(async (req, res) => {
   const ticket_secret = generateUniqueString()
 
   const qrPayload = {
+    id: ticket._id,
     code: ticket_secret
   };
 
@@ -250,7 +261,9 @@ export const scanTicket = catchAsync(async (req, res) => {
 
     ticket.status = "completed"
   }
-  ticket.status = "running"
+  else {
+    ticket.status = "running"
+  }
   ticket.qrCode = qrCode;
   ticket.ticket_secret = ticket_secret;
   const _ticket = await ticket.save()
