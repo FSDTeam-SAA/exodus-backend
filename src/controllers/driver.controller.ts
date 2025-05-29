@@ -223,7 +223,8 @@ export const driverScheduledTrips = catchAsync(async (req, res) => {
     throw new AppError(401, 'Unauthorized');
   }
 
-  const now = new Date("2025-05-28T08:00:00");
+  const now = new Date("2025-05-29T08:00:00");
+  // const now = new Date();
 
   // Day like 'Mon', 'Tue', etc.
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
