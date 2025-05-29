@@ -223,7 +223,7 @@ export const driverScheduledTrips = catchAsync(async (req, res) => {
     throw new AppError(401, 'Unauthorized');
   }
 
-  const now = new Date("2025-05-29T08:00:00");
+  const now = new Date();
   // const now = new Date();
 
   // Day like 'Mon', 'Tue', etc.
@@ -243,7 +243,7 @@ export const driverScheduledTrips = catchAsync(async (req, res) => {
       const [depHour, depMin] = daySchedule.departureTime.split(':').map(Number);
       const departureTime = new Date(now);
       departureTime.setHours(depHour, depMin, 0, 0);
-      if (departureTime <= now) continue;
+      if (departureTime < now) continue;
 
       const [arrHour, arrMin] = daySchedule.arrivalTime
         ? daySchedule.arrivalTime.split(':').map(Number)
