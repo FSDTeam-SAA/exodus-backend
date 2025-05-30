@@ -190,7 +190,7 @@ export const updateDriver = catchAsync(async (req, res) => {
           'Failed to upload image to Cloudinary'
         )
       }
-      avatar = {
+      driver.avatar = {
         public_id: cloudinaryResponse.public_id,
         url: cloudinaryResponse.secure_url,
       }
