@@ -80,6 +80,7 @@ export const getAllSchedules = catchAsync(
     const schedules = await Schedule.find()
       .populate('driverId')
       .populate('busId')
+      .sort( {createdAt: -1})
 
     // res.status(httpStatus.OK).json({
     //   success: true,
