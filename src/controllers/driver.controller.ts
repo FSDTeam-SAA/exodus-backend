@@ -180,6 +180,27 @@ export const updateDriver = catchAsync(async (req, res) => {
     (driver as any).phone = phone
   }
   driver.username = username || driver.username
+    let avatar
+  if (req.file) {
+    try {
+      const cloudinaryResponse = await uploadToCloudinary(req.file.path)
+      if (!cloudinaryResponse) {
+        throw new AppError(
+          httpStatus.INTERNAL_SERVER_ERROR,
+          'Failed to upload image to Cloudinary'
+        )
+      }
+      driver.avatar = {
+        public_id: cloudinaryResponse.public_id,
+        url: cloudinaryResponse.secure_url,
+      }
+    } catch (error) {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Error processing image upload'
+      )
+    }
+  }
 
   await driver.save()
 

@@ -12,7 +12,7 @@ const router = express.Router()
 
 router.post('/add/driver',upload.single("avatar"),  addDriver)
 router.get('/all/drivers', getAllDrivers)
-router.put('/drivers', updateDriver)
+router.put('/drivers',upload.single("avatar"), updateDriver)
 router.delete('/drivers/:id', deleteDriver)
 router.get('/drivers/schedule',protect,isDriver, driverScheduledTrips)
 
